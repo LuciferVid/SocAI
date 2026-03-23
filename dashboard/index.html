@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Dashboard — AI Threat Detection</title>
+    <meta name="description" content="Real-time security operations center dashboard with live threat monitoring">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- top nav -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo">
+                <span class="logo-icon">🛡️</span>
+                <span class="logo-text">SOC<span class="logo-accent">AI</span></span>
+            </div>
+            <span class="topbar-separator"></span>
+            <span class="pipeline-status" id="pipeline-status">
+                <span class="status-dot offline"></span>
+                Connecting…
+            </span>
+        </div>
+        <div class="topbar-right">
+            <button class="btn btn-ghost" id="btn-retrain" title="Retrain ML models">
+                🔄 Retrain
+            </button>
+            <span class="clock" id="clock">--:--:--</span>
+        </div>
+    </header>
+
+    <!-- stats cards -->
+    <section class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Events Processed</div>
+            <div class="stat-value" id="stat-events">0</div>
+            <div class="stat-trend up" id="stat-events-trend">+0/s</div>
+        </div>
+        <div class="stat-card alert-card">
+            <div class="stat-label">Active Alerts</div>
+            <div class="stat-value" id="stat-alerts">0</div>
+            <div class="stat-trend" id="stat-alerts-severity">—</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Blocked IPs</div>
+            <div class="stat-value" id="stat-blocked">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg Anomaly Score</div>
+            <div class="stat-value" id="stat-avg-score">0.00</div>
+            <div class="stat-bar">
+                <div class="stat-bar-fill" id="stat-score-bar" style="width:0%"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- main content grid -->
+    <main class="main-grid">
+        <!-- left: charts -->
+        <section class="panel chart-panel">
+            <div class="panel-header">
+                <h2>Traffic & Anomaly Timeline</h2>
+                <div class="panel-controls">
+                    <button class="btn btn-sm active" data-range="60">1m</button>
+                    <button class="btn btn-sm" data-range="300">5m</button>
+                    <button class="btn btn-sm" data-range="900">15m</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="timeline-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- right: alerts feed -->
+        <section class="panel alerts-panel">
+            <div class="panel-header">
+                <h2>🚨 Alert Feed</h2>
+                <span class="badge" id="alert-count-badge">0</span>
+            </div>
+            <div class="alert-list" id="alert-list">
+                <div class="alert-empty">No alerts yet. Pipeline starting…</div>
+            </div>
+        </section>
+
+        <!-- bottom: live event table -->
+        <section class="panel events-panel full-width">
+            <div class="panel-header">
+                <h2>Live Event Stream</h2>
+                <div class="panel-controls">
+                    <input type="text" class="filter-input" id="ip-filter"
+                           placeholder="Filter by IP…">
+                    <select class="filter-select" id="score-filter">
+                        <option value="0">All scores</option>
+                        <option value="0.5">≥ 0.5</option>
+                        <option value="0.7">≥ 0.7 (alerts)</option>
+                        <option value="0.9">≥ 0.9 (critical)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table class="event-table" id="event-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Source IP</th>
+                            <th>Method</th>
+                            <th>Path</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="event-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
