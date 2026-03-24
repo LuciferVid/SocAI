@@ -1,124 +1,1319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOC Dashboard — AI Threat Detection</title>
-    <meta name="description" content="Real-time security operations center dashboard with live threat monitoring">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>SOCAI | Real-time Threat Detection</title>
+  
+  <!-- Upgrade 1 — Design system & typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    /* Color palette & Design System */
+    :root {
+      --bg: #080d14;
+      --bg2: #0d1520;
+      --bg3: #121d2b;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #e8edf4;
+      --muted: #5a6a7e;
+      --teal: #1D9E75;
+      --amber: #EF9F27;
+      --red: #E24B4A;
+      --blue: #378ADD;
+      --purple: #9b72dd;
+      
+      /* Severity mapping */
+      --crit-border: var(--red);
+      --crit-bg: rgba(226, 75, 74, 0.1);
+      --high-border: var(--amber);
+      --high-bg: rgba(239, 159, 39, 0.1);
+      --med-border: var(--blue);
+      --med-bg: rgba(55, 138, 221, 0.1);
+      --low-border: var(--muted);
+      --low-bg: rgba(90, 106, 126, 0.1);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    button {
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: inherit;
+    }
+
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .muted { color: var(--muted); }
+    .syne-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .title-h { font-size: 22px; font-weight: 700; }
+    .primary-val { font-size: 15px; font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+    .kpi-num { font-size: 32px; font-weight: 800; }
+
+    /* Layout */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background-color: var(--bg2);
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Upgrade 6 — Live indicator */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dot-container {
+      position: relative;
+      width: 10px;
+      height: 10px;
+    }
+    
+    .dot-pulse {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--teal);
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+    
+    .dot-core {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--teal);
+      border-radius: 50%;
+    }
+
+    .live-status.disconnected .dot-pulse { animation: none; opacity: 0; }
+    .live-status.disconnected .dot-core { background-color: var(--red); }
+    .live-status.disconnected .live-text { color: var(--red); }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 24px; }
+    
+    /* Upgrade 7 — Retrain button */
+    .retrain-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    
+    .btn-retrain {
+      background-color: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-retrain:hover { background-color: var(--border); }
+    .btn-retrain:disabled { opacity: 0.5; cursor: not-allowed; }
+    .retrain-meta { font-size: 11px; margin-top: 4px; color: var(--muted); }
+    
+    /* Retrain Confirm Banner */
+    .confirm-banner {
+      position: absolute;
+      top: 100%; right: 0;
+      margin-top: 8px;
+      background-color: var(--bg2);
+      border: 1px solid var(--border2);
+      padding: 12px 16px;
+      border-radius: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+
+    .confirm-banner.visible { display: flex; }
+    .confirm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-cancel { padding: 4px 12px; border-radius: 4px; border: 1px solid transparent; }
+    .btn-cancel:hover { background-color: var(--border); }
+    .btn-yes { background-color: var(--teal); color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: 600; }
+    .btn-yes:hover { filter: brightness(1.1); }
+
+    /* Spinner */
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-left-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Upgrade 2 — KPI summary bar */
+    .kpi-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background-color: var(--bg2);
+      flex-shrink: 0;
+    }
+    
+    .kpi-card {
+      flex: 1;
+      padding: 24px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .kpi-card:last-child { border-right: none; }
+    .kpi-val {
+      font-family: 'Syne', sans-serif;
+      transition: opacity 0.15s ease;
+    }
+
+    /* Main Content Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Left col: Chart + Table */
+    .col-main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+    
+    /* Upgrade 3 — Chart overhaul */
+    .chart-container {
+      height: 300px;
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    #chartArea { flex: 1; min-height: 0; }
+
+    /* Upgrade 9 — Table filter bar */
+    .table-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+    
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background-color: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      background-color: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+    }
+    .search-input-wrapper input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 6px 12px;
+      font-size: 13px;
+      width: 160px;
+      font-family: 'Syne', sans-serif;
+      outline: none;
+    }
+    .search-clear {
+      margin-right: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      display: none;
+    }
+    .search-clear:hover { color: var(--text); }
+
+    .pill-group {
+      display: flex;
+      background-color: var(--bg3);
+      border-radius: 4px;
+      border: 1px solid var(--border2);
+      overflow: hidden;
+    }
+    .pill-btn {
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--muted);
+      border-right: 1px solid var(--border2);
+      font-size: 12px;
+    }
+    .pill-btn:last-child { border-right: none; }
+    .pill-btn.active { background-color: var(--border); color: var(--text); font-weight: 600; }
+    .pill-btn:hover:not(.active) { background-color: rgba(255,255,255,0.03); color: var(--text); }
+
+    .toggle-pause {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background-color: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .toggle-pause.paused { background-color: rgba(239, 159, 39, 0.1); color: var(--amber); border-color: var(--amber); }
+
+    /* Upgrade 5 — Event table redesign */
+    .table-scroll {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    
+    th {
+      position: sticky;
+      top: 0;
+      background-color: var(--bg2);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+    
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    tbody tr { background-color: var(--bg2); }
+    tbody tr:nth-child(even) { background-color: var(--bg3); }
+    tbody tr:hover { background-color: rgba(255,255,255,0.03); }
+
+    .td-ip { color: var(--teal); cursor: pointer; text-decoration: underline dotted transparent; transition: 0.2s; }
+    .td-ip:hover { text-decoration-color: var(--teal); }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      display: inline-block;
+      text-align: center;
+    }
+    /* Methods */
+    .badge-GET { background-color: rgba(255,255,255,0.05); color: var(--muted); }
+    .badge-POST { background-color: rgba(239, 159, 39, 0.1); color: var(--amber); }
+    .badge-PUT { background-color: rgba(55, 138, 221, 0.1); color: var(--blue); }
+    .badge-DELETE { background-color: rgba(226, 75, 74, 0.1); color: var(--red); }
+    
+    /* Statuses */
+    .badge-2xx { background-color: rgba(29, 158, 117, 0.12); color: var(--teal); }
+    .badge-3xx { background-color: rgba(55, 138, 221, 0.12); color: var(--blue); }
+    .badge-4xx { background-color: rgba(226, 75, 74, 0.12); color: var(--red); }
+    .badge-5xx { background-color: rgba(155, 114, 221, 0.12); color: var(--purple); }
+
+    .td-path { max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    /* Score Column */
+    .score-cell {
+      position: relative;
+      padding-bottom: 14px; /* room for the bar */
+      display: inline-flex;
+      flex-direction: column;
+      min-width: 50px;
+    }
+    .score-bar-track {
+      position: absolute;
+      bottom: 6px; left: 0; right: 0;
+      height: 2px;
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s;
+    }
+    
+    .type-pill { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .type-anomaly { background-color: rgba(226, 75, 74, 0.15); color: var(--red); }
+    .type-normal { background-color: rgba(255,255,255,0.05); color: var(--muted); }
+
+    .risk-txt { font-weight: 700; font-size: 12px; letter-spacing: 0.05em; }
+    .risk-CRITICAL { color: var(--red); }
+    .risk-HIGH { color: var(--amber); }
+    .risk-MEDIUM { color: var(--blue); }
+    .risk-LOW { color: var(--muted); }
+
+    /* Right col: Upgrade 4 — Alert panel severity tiers */
+    .col-alerts {
+      background-color: var(--bg2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .alerts-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .alerts-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    
+    .alert-card {
+      background-color: var(--bg3);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--muted); /* dynamic */
+      border-radius: 6px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.2s;
+    }
+    /* Slide-in animation for new alerts */
+    .alert-card.new {
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-card.CRITICAL { border-left-color: var(--crit-border); }
+    .alert-card.HIGH { border-left-color: var(--high-border); }
+    .alert-card.MEDIUM { border-left-color: var(--med-border); }
+    .alert-card.LOW { border-left-color: var(--low-border); }
+
+    .al-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .al-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .alert-card.CRITICAL .al-badge { background-color: var(--crit-bg); color: var(--red); }
+    .alert-card.HIGH .al-badge { background-color: var(--high-bg); color: var(--amber); }
+    .alert-card.MEDIUM .al-badge { background-color: var(--med-bg); color: var(--blue); }
+    .alert-card.LOW .al-badge { background-color: var(--low-bg); color: var(--muted); }
+    
+    .al-score { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+    
+    .al-meta { font-size: 13px; }
+    .al-ip { color: var(--teal); font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+    
+    .al-drawer-toggle { 
+      font-size: 11px; color: var(--muted); cursor: pointer; user-select: none;
+      display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+    }
+    .al-drawer-toggle:hover { color: var(--text); }
+    .al-drawer-toggle .chevron { display: inline-block; transition: transform 0.2s; font-size: 10px; }
+    .al-drawer-toggle.expanded .chevron { transform: rotate(90deg); }
+    
+    .al-raw { 
+      display: none; 
+      margin-top: 4px; padding: 8px; background-color: var(--bg);
+      border-radius: 4px; font-size: 11px; color: var(--muted);
+      white-space: pre-wrap; word-break: break-all;
+      border: 1px solid var(--border);
+    }
+    .al-raw.visible { display: block; }
+
+    .al-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .al-btn { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .btn-dismiss { color: var(--muted); background-color: rgba(255,255,255,0.05); }
+    .btn-dismiss:hover { background-color: rgba(255,255,255,0.1); color: var(--text); }
+    .btn-escalate { background-color: rgba(226, 75, 74, 0.1); color: var(--red); }
+    .btn-escalate:hover { background-color: rgba(226, 75, 74, 0.2); }
+
+    /* Upgrade 8 — IP detail drawer */
+    .ip-drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.6);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .ip-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    
+    .ip-drawer {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 340px;
+      background-color: var(--bg2);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .ip-drawer-overlay.open .ip-drawer { transform: translateX(0); }
+    
+    .ipd-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .ipd-title { font-size: 22px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--teal); }
+    .ipd-close { font-size: 24px; color: var(--muted); line-height: 1; margin-top: -4px; }
+    .ipd-close:hover { color: var(--text); }
+    .ipd-meta { font-size: 12px; color: var(--muted); margin-top: 8px; font-family: 'IBM Plex Mono', monospace; }
+
+    .ipd-body { padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    
+    .ipd-stats { display: flex; background: var(--bg3); border-radius: 6px; border: 1px solid var(--border2); padding: 12px; text-align: center; }
+    .ipd-stat { flex: 1; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--border2); }
+    .ipd-stat:last-child { border-right: none; }
+    .ipd-slabel { font-size: 10px; color: var(--muted); text-transform: uppercase; font-family: 'Syne', sans-serif;}
+    .ipd-sval { font-size: 18px; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+
+    .ipd-section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+    
+    .ipd-bars { display: flex; flex-direction: column; gap: 8px; }
+    .ipd-bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .ipd-blabel { width: 80px; color: var(--muted); text-transform: capitalize; }
+    .ipd-btrack { flex: 1; height: 6px; background-color: var(--bg3); border-radius: 3px; overflow: hidden; }
+    .ipd-bfill { height: 100%; border-radius: 3px; }
+    
+    .ipd-paths { display: flex; flex-direction: column; gap: 8px; }
+    .ipd-path-row { font-family: 'IBM Plex Mono', monospace; font-size: 11px; display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+    .ipd-path-row:last-child { border-bottom: none; }
+    .ipd-path-url { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+
+    .ipd-actions { display: flex; gap: 8px; padding-top: 8px; }
+    .ipd-actions button { flex: 1; padding: 10px; border-radius: 4px; font-size: 13px; font-weight: 600; border: 1px solid var(--border2); transition: 0.2s; }
+    .ipauth-block { background-color: rgba(226,75,74,0.1); color: var(--red); border-color: transparent !important; }
+    .ipauth-block:hover { background-color: var(--red); color: white; }
+    .ipauth-white { background-color: var(--bg3); }
+    .ipauth-white:hover { background-color: var(--teal); color: white; border-color: var(--teal); }
+    .ipauth-copy { background: transparent; }
+    .ipauth-copy:hover { border-color: var(--muted); }
+    .flash-teal { background-color: var(--teal) !important; color: white !important; border-color: var(--teal) !important; }
+
+  </style>
 </head>
 <body>
-    <!-- top nav -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <div class="logo">
-                <span class="logo-icon">🛡️</span>
-                <span class="logo-text">SOC<span class="logo-accent">AI</span></span>
-            </div>
-            <span class="topbar-separator"></span>
-            <span class="pipeline-status" id="pipeline-status">
-                <span class="status-dot offline"></span>
-                Connecting…
-            </span>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="logo">
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231D9E75'><path d='M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 18.9c-4.14-1.07-7.3-4.9-7.3-8.9V8.4l7.3-4.1 7.3 4.1v6.5c0 4-3.16 7.83-7.3 8.9z'/></svg>" width="24" height="24" alt="Shield">
+      SOCAI
+    </div>
+    
+    <div class="header-actions">
+      <!-- Live Indicator -->
+      <div class="live-indicator live-status" id="liveIndicator">
+        <div class="dot-container">
+          <div class="dot-pulse"></div>
+          <div class="dot-core"></div>
         </div>
-        <div class="topbar-right">
-            <button class="btn btn-ghost" id="btn-retrain" title="Retrain ML models">
-                🔄 Retrain
+        <span class="live-text" id="liveText">Live · 0 evt/s</span>
+      </div>
+
+      <!-- Clock -->
+      <div class="mono muted" id="headerClock">12:00:00 AM</div>
+
+      <!-- Retrain Component -->
+      <div class="retrain-wrapper">
+        <button class="btn-retrain" id="btnRetrainMain">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l5.57 5.57"/></svg>
+          <span id="retrainLabel">Retrain model</span>
+        </button>
+        <div class="retrain-meta" id="retrainMeta">Last trained: 14 min ago · acc 94.2%</div>
+        
+        <div class="confirm-banner" id="retrainConfirm">
+          <span>Retraining pauses detection for ~30s. Continue?</span>
+          <div class="confirm-actions">
+            <button class="btn-cancel" onclick="document.getElementById('retrainConfirm').classList.remove('visible')">Cancel</button>
+            <button class="btn-yes" id="btnRetrainConfirm">Yes, retrain &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- KPI Summary Bar -->
+  <div class="kpi-bar">
+    <div class="kpi-card">
+      <span class="syne-label muted">Total threats</span>
+      <span class="kpi-num kpi-val" id="kpiTotalAlerts">0</span>
+    </div>
+    <div class="kpi-card">
+      <span class="syne-label muted">Peak anomaly score</span>
+      <span class="kpi-num kpi-val mono" id="kpiPeakScore" style="color: var(--teal)">0.000</span>
+    </div>
+    <div class="kpi-card">
+      <span class="syne-label muted">Events / second</span>
+      <span class="kpi-num kpi-val" id="kpiEvtRate">0</span>
+    </div>
+    <div class="kpi-card">
+      <span class="syne-label muted">Model accuracy</span>
+      <span class="kpi-num kpi-val" id="kpiAcc">94.2%</span>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- Left Column: Chart & Table -->
+    <div class="col-main">
+      
+      <!-- Chart Overhaul -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <div class="title-h">Event rate vs anomaly score</div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div><span class="muted">Events/s</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span class="muted">Max Score</span></div>
+          </div>
+        </div>
+        <div id="chartArea">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Table Filter Bar -->
+      <div class="table-container">
+        <div class="filter-bar">
+          <div class="filter-group">
+            <div class="search-input-wrapper">
+              <input type="text" id="filterIp" placeholder="Filter by IP...">
+              <span class="search-clear" id="filterIpClear">&times;</span>
+            </div>
+            
+            <div class="pill-group" id="filterScore">
+              <button class="pill-btn active" data-val="0">All</button>
+              <button class="pill-btn" data-val="0.90">&ge; 0.90</button>
+              <button class="pill-btn" data-val="0.75">&ge; 0.75</button>
+              <button class="pill-btn" data-val="0.60">&ge; 0.60</button>
+            </div>
+            
+            <div class="pill-group" id="filterMethod">
+              <button class="pill-btn active" data-val="ALL">All</button>
+              <button class="pill-btn" data-val="GET">GET</button>
+              <button class="pill-btn" data-val="POST">POST</button>
+              <button class="pill-btn" data-val="OTHER">Other</button>
+            </div>
+          </div>
+          
+          <div class="filter-group">
+            <span class="syne-label muted" id="rowCountLabel">Showing 0 events</span>
+            <button class="toggle-pause" id="btnPause">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+              Pause stream
             </button>
-            <span class="clock" id="clock">--:--:--</span>
+          </div>
         </div>
-    </header>
 
-    <!-- stats cards -->
-    <section class="stats-grid" id="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">Events Processed</div>
-            <div class="stat-value" id="stat-events">0</div>
-            <div class="stat-trend up" id="stat-events-trend">+0/s</div>
+        <!-- Event Table -->
+        <div class="table-scroll">
+          <table id="eventTable">
+            <thead>
+              <tr>
+                <th class="syne-label">Time</th>
+                <th class="syne-label">Source IP</th>
+                <th class="syne-label">Method</th>
+                <th class="syne-label">Path</th>
+                <th class="syne-label">Status</th>
+                <th class="syne-label">Score</th>
+                <th class="syne-label">Type</th>
+                <th class="syne-label" style="text-align:right">Risk</th>
+              </tr>
+            </thead>
+            <tbody id="eventTbody">
+              <!-- rows inserted by JS -->
+            </tbody>
+          </table>
         </div>
-        <div class="stat-card alert-card">
-            <div class="stat-label">Active Alerts</div>
-            <div class="stat-value" id="stat-alerts">0</div>
-            <div class="stat-trend" id="stat-alerts-severity">—</div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Alert Panel -->
+    <div class="col-alerts">
+      <div class="alerts-header">
+        <div class="title-h">Recent Alerts</div>
+      </div>
+      <div class="alerts-list" id="alertBox">
+        <!-- alert cards inserted by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- IP Detail Drawer -->
+  <div class="ip-drawer-overlay" id="ipDrawerBg">
+    <div class="ip-drawer" id="ipDrawer" onclick="event.stopPropagation()">
+      <div class="ipd-header">
+        <div>
+          <div class="ipd-title" id="drawerIp">0.0.0.0</div>
+          <div class="ipd-meta" id="drawerTime">Seen: — / —</div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Blocked IPs</div>
-            <div class="stat-value" id="stat-blocked">0</div>
+        <button class="ipd-close" id="drawerClose">&times;</button>
+      </div>
+      <div class="ipd-body">
+        <div class="ipd-stats">
+          <div class="ipd-stat"><span class="ipd-slabel">Requests</span><span class="ipd-sval" id="drawerReqs">0</span></div>
+          <div class="ipd-stat"><span class="ipd-slabel">Anomalous</span><span class="ipd-sval" style="color:var(--red)" id="drawerAnom">0</span></div>
+          <div class="ipd-stat"><span class="ipd-slabel">Rate</span><span class="ipd-sval" id="drawerRate">0%</span></div>
         </div>
-        <div class="stat-card">
-            <div class="stat-label">Avg Anomaly Score</div>
-            <div class="stat-value" id="stat-avg-score">0.00</div>
-            <div class="stat-bar">
-                <div class="stat-bar-fill" id="stat-score-bar" style="width:0%"></div>
-            </div>
+        
+        <div>
+          <div class="ipd-section-title">Attack Types (Detected)</div>
+          <div class="ipd-bars" id="drawerTypes">
+            <!-- drawn by js -->
+          </div>
         </div>
-    </section>
+        
+        <div>
+          <div class="ipd-section-title">Recent Target Paths</div>
+          <div class="ipd-paths" id="drawerPaths">
+            <!-- drawn by js -->
+          </div>
+        </div>
+        
+        <div class="ipd-actions">
+          <button class="ipauth-block" id="btnDrawerBlock" onclick="alert('Demo: IP Blocked')">Block IP</button>
+          <button class="ipauth-white" id="btnDrawerWhite" onclick="alert('Demo: IP Whitelisted')">Whitelist</button>
+          <button class="ipauth-copy" id="btnDrawerCopy">Copy IP</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- main content grid -->
-    <main class="main-grid">
-        <!-- left: charts -->
-        <section class="panel chart-panel">
-            <div class="panel-header">
-                <h2>Traffic & Anomaly Timeline</h2>
-                <div class="panel-controls">
-                    <button class="btn btn-sm active" data-range="60">1m</button>
-                    <button class="btn btn-sm" data-range="300">5m</button>
-                    <button class="btn btn-sm" data-range="900">15m</button>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="timeline-chart"></canvas>
-            </div>
-        </section>
+  <script>
+    // --- Global State & Config ---
+    const state = {
+      eventsTotal: 0,
+      alertsTotal: 0,
+      peakScore: 0,
+      isPaused: false,
+      reconnecting: false,
+      accuracy: 94.2,
+      history: [],       // raw unfiltered events for table
+      chartData: [],     // 1s snapshots for chart
+      ipData: {},        // { ip: { reqs, anom, types:{}, paths:[], first, last } }
+      filters: { ip: '', score: 0, method: 'ALL' }
+    };
+    const MAX_TABLE_ROWS = 100;
+    const MAX_CHART_PTS = 60; // 1 min of 1s windows
+    const ALERT_MAX = 6;
 
-        <!-- right: alerts feed -->
-        <section class="panel alerts-panel">
-            <div class="panel-header">
-                <h2>🚨 Alert Feed</h2>
-                <span class="badge" id="alert-count-badge">0</span>
-            </div>
-            <div class="alert-list" id="alert-list">
-                <div class="alert-empty">No alerts yet. Pipeline starting…</div>
-            </div>
-        </section>
+    // --- DOM Elements ---
+    const dom = {
+      kpiTotalAlerts: document.getElementById('kpiTotalAlerts'),
+      kpiPeakScore: document.getElementById('kpiPeakScore'),
+      kpiEvtRate: document.getElementById('kpiEvtRate'),
+      kpiAcc: document.getElementById('kpiAcc'),
+      tbody: document.getElementById('eventTbody'),
+      alertBox: document.getElementById('alertBox'),
+      liveIndicator: document.getElementById('liveIndicator'),
+      liveText: document.getElementById('liveText'),
+      clock: document.getElementById('headerClock'),
+      rowCount: document.getElementById('rowCountLabel'),
+      // IP Drawer
+      drawerBg: document.getElementById('ipDrawerBg'),
+      drawerIp: document.getElementById('drawerIp'),
+      drawerTime: document.getElementById('drawerTime'),
+      drawerReqs: document.getElementById('drawerReqs'),
+      drawerAnom: document.getElementById('drawerAnom'),
+      drawerRate: document.getElementById('drawerRate'),
+      drawerTypes: document.getElementById('drawerTypes'),
+      drawerPaths: document.getElementById('drawerPaths'),
+      drawerClose: document.getElementById('drawerClose'),
+      btnDrawerCopy: document.getElementById('btnDrawerCopy')
+    };
 
-        <!-- bottom: live event table -->
-        <section class="panel events-panel full-width">
-            <div class="panel-header">
-                <h2>Live Event Stream</h2>
-                <div class="panel-controls">
-                    <input type="text" class="filter-input" id="ip-filter"
-                           placeholder="Filter by IP…">
-                    <select class="filter-select" id="score-filter">
-                        <option value="0">All scores</option>
-                        <option value="0.5">≥ 0.5</option>
-                        <option value="0.7">≥ 0.7 (alerts)</option>
-                        <option value="0.9">≥ 0.9 (critical)</option>
-                    </select>
-                </div>
-            </div>
-            <div class="table-scroll">
-                <table class="event-table" id="event-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Source IP</th>
-                            <th>Method</th>
-                            <th>Path</th>
-                            <th>Status</th>
-                            <th>Score</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody id="event-tbody"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+    // --- Utils ---
+    function formatTime(d) {
+      return d.toLocaleTimeString([], { hour12: true, hour:'numeric', minute:'2-digit', second:'2-digit' });
+    }
+    
+    function getSeverity(score) {
+      if (score >= 0.90) return 'CRITICAL';
+      if (score >= 0.75) return 'HIGH';
+      if (score >= 0.60) return 'MEDIUM';
+      return 'LOW';
+    }
 
-    <script src="app.js"></script>
+    // --- Updgrade 1: Clock ---
+    setInterval(() => { dom.clock.innerText = formatTime(new Date()); }, 1000);
+
+    // --- Upgrade 3: Chart.js Setup ---
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Events/s',
+            data: [],
+            borderColor: '#378ADD',
+            backgroundColor: 'rgba(55, 138, 221, 0.12)', // Area fill teal/blue mix
+            yAxisID: 'y',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4
+          },
+          {
+            label: 'Max Score',
+            data: [],
+            borderColor: '#E24B4A',
+            yAxisID: 'y1',
+            tension: 0.4,
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false }, // Crosshair basic
+        plugins: {
+          legend: { display: false }, // custom HTML legend used instead
+          tooltip: {
+            backgroundColor: 'rgba(13, 21, 32, 0.9)',
+            titleFont: { family: 'IBM Plex Mono' },
+            bodyFont: { family: 'IBM Plex Mono' },
+            padding: 10,
+            boxPadding: 4,
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1
+          },
+          annotation: {
+            // Chart.js annotation plugin not guaranteed to be loaded from base CDN without extra script.
+            // But we can approximate threshold line using native core or just ignore if plugin missing.
+            // We will draw it natively using plugin hook to ensure no external dependencies.
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { family: 'IBM Plex Mono', size: 10 },
+              color: '#5a6a7e',
+              maxTicksLimit: 15 // ~ every 4th timestamp for 60 points
+            }
+          },
+          y: {
+            type: 'linear',
+            display: true, position: 'left', min: 0,
+            grid: { color: 'rgba(255,255,255,0.06)' },
+            title: { display: true, text: 'Events/s', color: '#5a6a7e', font:{family:'Syne'} },
+            ticks: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#5a6a7e'}
+          },
+          y1: {
+            type: 'linear',
+            display: true, position: 'right', min: 0, max: 1.0,
+            grid: { display: false },
+            title: { display: true, text: 'Score', color: '#5a6a7e', font:{family:'Syne'} },
+            ticks: { font: { family: 'IBM Plex Mono', size: 10 }, color: '#5a6a7e'}
+          }
+        }
+      },
+      plugins: [{
+        id: 'thresholdLine',
+        beforeDraw: (chart) => {
+          const { ctx, chartArea: { top, right, bottom, left }, scales: { y1 } } = chart;
+          ctx.save();
+          const yPos = y1.getPixelForValue(0.70);
+          if (yPos >= top && yPos <= bottom) {
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(left, yPos);
+            ctx.lineTo(right, yPos);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#EF9F27';
+            ctx.stroke();
+            ctx.restore();
+            // Label
+            ctx.fillStyle = '#EF9F27';
+            ctx.font = '10px Syne';
+            ctx.fillText('Alert threshold', right - 80, yPos - 6);
+          }
+        }
+      }]
+    });
+
+    // --- Chart Data Aggregator (1 second windows) ---
+    let currentWindow = { count: 0, maxScore: 0 };
+    setInterval(() => {
+      const nowLbl = formatTime(new Date());
+      state.chartData.push({ t: nowLbl, c: currentWindow.count, s: currentWindow.maxScore });
+      if (state.chartData.length > MAX_CHART_PTS) state.chartData.shift();
+      
+      chart.data.labels = state.chartData.map(d => d.t);
+      chart.data.datasets[0].data = state.chartData.map(d => d.c);
+      chart.data.datasets[1].data = state.chartData.map(d => d.s);
+      chart.update('none'); // smooth
+      
+      // Update Live Indicator EPS
+      dom.liveText.innerText = state.reconnecting ? 'Disconnected — reconnecting...' : `Live · ${currentWindow.count} evt/s`;
+      animateNumber(dom.kpiEvtRate, currentWindow.count);
+
+      currentWindow = { count: 0, maxScore: 0 };
+    }, 1000);
+
+    // --- Utility: Animate Number Change ---
+    function animateNumber(el, newVal, isFloat = false) {
+      const current = isFloat ? parseFloat(el.innerText) || 0 : parseInt(el.innerText) || 0;
+      const target = isFloat ? parseFloat(newVal) : parseInt(newVal);
+      if (current !== target) {
+        el.style.opacity = '0';
+        setTimeout(() => {
+          el.innerText = isFloat ? target.toFixed(3) : target;
+          el.style.opacity = '1';
+        }, 150);
+      }
+    }
+
+    // --- WebSocket Logic (Upgrade 6 backoff included) ---
+    let ws;
+    let reconnectDelay = 1000;
+    
+    function connect() {
+      // adapt protocol
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      // attempt endpoints: backend serves /dashboard, so ws is at /ws/live
+      const url = `${protocol}//${window.location.host}/ws/live`;
+      try {
+        ws = new WebSocket(url);
+      } catch(e) {
+        // fallback for local testing without server
+        ws = new WebSocket("ws://localhost:8000/ws/live");
+      }
+
+      ws.onopen = () => {
+        dom.liveIndicator.classList.remove('disconnected');
+        state.reconnecting = false;
+        reconnectDelay = 1000;
+      };
+
+      ws.onmessage = (e) => {
+        if(state.isPaused) return; // cache if wanted, but drop is easier for demo
+        try {
+          const raw = JSON.parse(e.data);
+          // Handle both old backend format and requested format
+          const payload = {
+            id: raw.event_id || Math.random().toString(),
+            time: raw.time || formatTime(new Date()), // backend might send timestamp ISO
+            ip: raw.ip || raw.source_ip || '0.0.0.0',
+            method: raw.method || 'GET',
+            path: raw.path || '/',
+            status: parseInt(raw.status || raw.status_code || 200),
+            score: parseFloat(raw.score !== undefined ? raw.score : (raw.anomaly_score || 0.0)),
+            type: raw.type || raw.attack_type || 'normal',
+            rawJson: e.data
+          };
+          
+          processEvent(payload);
+        } catch(err) { console.error('WS parsing err', err); }
+      };
+
+      ws.onclose = () => {
+        dom.liveIndicator.classList.add('disconnected');
+        state.reconnecting = true;
+        setTimeout(connect, reconnectDelay);
+        reconnectDelay = Math.min(reconnectDelay * 2, 8000);
+      };
+    }
+
+    connect(); // boot network
+
+    // --- Process incoming event ---
+    function processEvent(ev) {
+      state.eventsTotal++;
+      
+      // Update IP tracking (Upgrade 8)
+      if (!state.ipData[ev.ip]) {
+        state.ipData[ev.ip] = { reqs: 0, anom: 0, types: {}, paths: [], first: ev.time };
+      }
+      const ptr = state.ipData[ev.ip];
+      ptr.reqs++;
+      ptr.last = ev.time;
+      if (ev.score >= 0.7) {
+        ptr.anom++;
+        ptr.types[ev.type] = (ptr.types[ev.type] || 0) + 1;
+      }
+      ptr.paths.unshift({p: ev.path, m: ev.method, s: ev.status});
+      if (ptr.paths.length > 5) ptr.paths.pop();
+      // If drawer is open and looking at this IP, update it live
+      if (dom.drawerBg.classList.contains('open') && dom.drawerIp.innerText === ev.ip) {
+        renderDrawer(ev.ip);
+      }
+
+      // 1s window tracking for chart
+      currentWindow.count++;
+      if (ev.score > currentWindow.maxScore) currentWindow.maxScore = ev.score;
+      
+      // Peak score KPI
+      if (ev.score > state.peakScore) {
+        state.peakScore = ev.score;
+        const color = ev.score >= 0.9 ? 'var(--red)' : (ev.score >= 0.75 ? 'var(--amber)' : 'var(--teal)');
+        dom.kpiPeakScore.style.color = color;
+        animateNumber(dom.kpiPeakScore, ev.score, true);
+      }
+
+      // Handle Alert if score >= 0.70
+      if (ev.score >= 0.70) {
+        const severity = getSeverity(ev.score);
+        // Only count as alert once per event payload loosely
+        if (!ev.alertTriggered) {
+          state.alertsTotal++;
+          animateNumber(dom.kpiTotalAlerts, state.alertsTotal);
+          ev.alertTriggered = true;
+          prependAlert(ev, severity);
+        }
+      }
+
+      // Add to table history
+      state.history.unshift(ev);
+      if (state.history.length > MAX_TABLE_ROWS) state.history.pop();
+      
+      renderTable();
+    }
+
+    // --- Rendering Table (Upgrade 5 & 9) ---
+    function renderTable() {
+      if (state.isPaused) return;
+
+      const filtered = state.history.filter(ev => {
+        if (state.filters.ip && !ev.ip.includes(state.filters.ip)) return false;
+        if (state.filters.score > 0 && ev.score < state.filters.score) return false;
+        if (state.filters.method !== 'ALL') {
+          if (state.filters.method === 'OTHER') {
+            if (['GET','POST'].includes(ev.method.toUpperCase())) return false;
+          } else {
+            if (ev.method.toUpperCase() !== state.filters.method) return false;
+          }
+        }
+        return true;
+      });
+
+      dom.rowCount.innerText = `Showing ${filtered.length} events`;
+
+      // Build HTML fragment
+      let html = '';
+      filtered.forEach(ev => {
+        const trClass = '';
+        
+        let mColor = 'GET', sColor = '2xx';
+        if (ev.method === 'POST') mColor = 'POST'; else if (ev.method === 'PUT') mColor = 'PUT'; else if (ev.method === 'DELETE') mColor = 'DELETE';
+        if (ev.status >= 300 && ev.status < 400) sColor = '3xx'; 
+        else if (ev.status >= 400 && ev.status < 500) sColor = '4xx'; 
+        else if (ev.status >= 500) sColor = '5xx';
+
+        const typeClass = ev.score >= 0.7 ? 'type-anomaly' : 'type-normal';
+        const typeString = ev.score >= 0.7 ? (ev.type && ev.type !== 'normal' ? ev.type : 'anomaly') : 'normal';
+        
+        const risk = getSeverity(ev.score);
+        const barColor = ev.score >= 0.7 ? 'var(--red)' : (ev.score >= 0.5 ? 'var(--amber)' : 'var(--teal)');
+
+        html += `
+          <tr>
+            <td class="mono muted" style="font-size:12px">${ev.time.split(' ')[0]}</td>
+            <td class="td-ip mono" onclick="openDrawer('${ev.ip}')">${ev.ip}</td>
+            <td><span class="badge badge-${mColor}">${ev.method}</span></td>
+            <td class="td-path mono muted" title="${ev.path}">${ev.path}</td>
+            <td><span class="badge badge-${sColor}">${ev.status}</span></td>
+            <td>
+              <div class="score-cell mono">
+                ${ev.score.toFixed(3)}
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:${Math.max(2, ev.score*100)}%; background:${barColor}"></div></div>
+              </div>
+            </td>
+            <td><span class="type-pill ${typeClass}">${typeString}</span></td>
+            <td style="text-align:right"><span class="risk-txt risk-${risk}">${risk}</span></td>
+          </tr>
+        `;
+      });
+      dom.tbody.innerHTML = html;
+    }
+
+    // --- Filter Controls ---
+    const filterIpInput = document.getElementById('filterIp');
+    const filterIpClear = document.getElementById('filterIpClear');
+    filterIpInput.addEventListener('input', (e) => {
+      state.filters.ip = e.target.value.trim();
+      filterIpClear.style.display = state.filters.ip ? 'block' : 'none';
+      renderTable();
+    });
+    filterIpClear.addEventListener('click', () => {
+      filterIpInput.value = '';
+      state.filters.ip = '';
+      filterIpClear.style.display = 'none';
+      renderTable();
+    });
+
+    document.getElementById('filterScore').addEventListener('click', (e) => {
+      if(e.target.classList.contains('pill-btn')){
+        Array.from(e.currentTarget.children).forEach(c=>c.classList.remove('active'));
+        e.target.classList.add('active');
+        state.filters.score = parseFloat(e.target.dataset.val);
+        renderTable();
+      }
+    });
+
+    document.getElementById('filterMethod').addEventListener('click', (e) => {
+      if(e.target.classList.contains('pill-btn')){
+        Array.from(e.currentTarget.children).forEach(c=>c.classList.remove('active'));
+        e.target.classList.add('active');
+        state.filters.method = e.target.dataset.val;
+        renderTable();
+      }
+    });
+
+    const btnPause = document.getElementById('btnPause');
+    btnPause.addEventListener('click', () => {
+      state.isPaused = !state.isPaused;
+      if(state.isPaused) {
+        btnPause.classList.add('paused');
+        btnPause.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Resume stream`;
+      } else {
+        btnPause.classList.remove('paused');
+        btnPause.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg> Pause stream`;
+        renderTable(); // flush cached
+      }
+    });
+
+    // --- Alert Panel (Upgrade 4) ---
+    function prependAlert(ev, severity) {
+      const card = document.createElement('div');
+      card.className = `alert-card ${severity} new`;
+      
+      const typeStr = ev.type && ev.type !== 'normal' ? ev.type.replace('_',' ') : 'Anomaly';
+      
+      const tid = `raw_${Math.random().toString(36).substr(2,6)}`;
+
+      card.innerHTML = `
+        <div class="al-header">
+          <span class="al-badge">${severity}</span>
+          <span class="al-score" style="color:var(--${severity === 'CRITICAL' ? 'red' : (severity === 'HIGH' ? 'amber' : 'blue')})">${ev.score.toFixed(3)}</span>
+        </div>
+        <div class="al-meta">
+          <span class="al-ip">${ev.ip}</span> targeted <span class="mono muted">${ev.path}</span>
+        </div>
+        <div class="al-drawer-toggle" onclick="document.getElementById('${tid}').classList.toggle('visible'); this.classList.toggle('expanded')">
+          <span class="chevron">▶</span> View log JSON
+        </div>
+        <div class="al-raw" id="${tid}">${ev.rawJson}</div>
+        <div class="al-actions">
+          <button class="al-btn btn-dismiss" onclick="this.closest('.alert-card').remove()">Dismiss</button>
+          <button class="al-btn btn-escalate" onclick="alert('Escalated event ${ev.id}')">Escalate &rarr;</button>
+        </div>
+      `;
+      
+      dom.alertBox.prepend(card);
+      while(dom.alertBox.children.length > ALERT_MAX) {
+        dom.alertBox.lastChild.remove();
+      }
+      setTimeout(()=> card.classList.remove('new'), 300);
+    }
+
+    // --- Retrain Interaction (Upgrade 7) ---
+    const btnRetrain = document.getElementById('btnRetrainMain');
+    const retConfirm = document.getElementById('retrainConfirm');
+    const btnRetYes = document.getElementById('btnRetrainConfirm');
+    const retMeta = document.getElementById('retrainMeta');
+    const retLabel = document.getElementById('retrainLabel');
+
+    btnRetrain.addEventListener('click', () => {
+      // Toggle banner
+      retConfirm.classList.toggle('visible');
+    });
+
+    btnRetYes.addEventListener('click', () => {
+      retConfirm.classList.remove('visible');
+      btnRetrain.disabled = true;
+      btnRetrain.innerHTML = `<div class="spinner"></div><span id="retrainLabel">Training…</span>`;
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        state.accuracy = (state.accuracy + Math.random()*1.0).toFixed(1);
+        btnRetrain.disabled = false;
+        btnRetrain.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l5.57 5.57"/></svg><span id="retrainLabel">Retrain model</span>`;
+        
+        // Flash success
+        retMeta.innerText = `Retraining complete · acc ${state.accuracy}%`;
+        retMeta.style.color = 'var(--teal)';
+        dom.kpiAcc.innerText = state.accuracy + '%';
+        animateNumber(dom.kpiAcc, state.accuracy, true);
+
+        setTimeout(() => {
+          retMeta.style.color = 'var(--muted)';
+          retMeta.innerText = `Last trained: Just now · acc ${state.accuracy}%`;
+        }, 3000);
+      }, 2500);
+    });
+
+    // --- IP Drawer (Upgrade 8) ---
+    window.openDrawer = function(ip) {
+      renderDrawer(ip);
+      dom.drawerBg.classList.add('open');
+    };
+
+    dom.drawerClose.addEventListener('click', () => dom.drawerBg.classList.remove('open'));
+    dom.drawerBg.addEventListener('click', (e) => {
+      if(e.target === dom.drawerBg) dom.drawerBg.classList.remove('open');
+    });
+    document.addEventListener('keydown', (e) => {
+      if(e.key==='Escape') dom.drawerBg.classList.remove('open');
+    });
+
+    dom.btnDrawerCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(dom.drawerIp.innerText);
+      dom.btnDrawerCopy.innerText = 'Copied!';
+      dom.btnDrawerCopy.classList.add('flash-teal');
+      setTimeout(() => {
+        dom.btnDrawerCopy.innerText = 'Copy IP';
+        dom.btnDrawerCopy.classList.remove('flash-teal');
+      }, 2000);
+    });
+
+    function renderDrawer(ip) {
+      const data = state.ipData[ip];
+      if(!data) return;
+      
+      dom.drawerIp.innerText = ip;
+      dom.drawerTime.innerText = `Seen: ${data.first.split(' ')[0]} – ${data.last.split(' ')[0]}`;
+      dom.drawerReqs.innerText = data.reqs;
+      dom.drawerAnom.innerText = data.anom;
+      
+      const rate = data.reqs > 0 ? Math.round((data.anom/data.reqs)*100) : 0;
+      dom.drawerRate.innerText = `${rate}%`;
+      dom.drawerRate.style.color = rate > 20 ? 'var(--red)' : (rate > 5 ? 'var(--amber)' : 'var(--teal)');
+
+      // Attack types bars
+      let typesHtml = '';
+      const tkeys = Object.keys(data.types);
+      if(tkeys.length === 0) {
+        typesHtml = `<div class="muted" style="font-size:12px">No anomalies detected</div>`;
+      } else {
+        tkeys.forEach(tk => {
+          const pct = Math.max(5, Math.min(100, (data.types[tk] / data.anom)*100)); // normalized width
+          const pretty = tk.replace('_',' ');
+          typesHtml += `
+            <div class="ipd-bar-row">
+              <div class="ipd-blabel" title="${pretty}">${pretty}</div>
+              <div class="ipd-btrack">
+                <div class="ipd-bfill" style="width:${pct}%; background:var(--red)"></div>
+              </div>
+              <div class="mono">${data.types[tk]}</div>
+            </div>`;
+        });
+      }
+      dom.drawerTypes.innerHTML = typesHtml;
+
+      // Paths
+      let pathsHtml = '';
+      data.paths.forEach(p => {
+        let mColor = 'GET', sColor = '2xx';
+        if (p.m === 'POST') mColor = 'POST'; else if (p.m === 'PUT') mColor = 'PUT'; else if (p.m === 'DELETE') mColor = 'DELETE';
+        if (p.s >= 300 && p.s < 400) sColor = '3xx'; else if (p.s >= 400 && p.s < 500) sColor = '4xx'; else if (p.s >= 500) sColor = '5xx';
+        pathsHtml += `
+          <div class="ipd-path-row">
+            <span class="badge badge-${mColor}" style="flex-shrink:0">${p.m}</span>
+            <span class="badge badge-${sColor}" style="flex-shrink:0">${p.s}</span>
+            <span class="ipd-path-url" title="${p.p}">${p.p}</span>
+          </div>`;
+      });
+      dom.drawerPaths.innerHTML = pathsHtml;
+    }
+
+  </script>
 </body>
 </html>

@@ -65,8 +65,8 @@ async def update_reputation(
                 anomaly_sum=anomaly_score,
                 reputation_score=contribution,
                 tag=_compute_tag(contribution),
-                first_seen=datetime.now(timezone.utc),
-                last_seen=datetime.now(timezone.utc),
+                first_seen=datetime.now(timezone.utc).replace(tzinfo=None),
+                last_seen=datetime.now(timezone.utc).replace(tzinfo=None),
             )
             session.add(record)
         else:
@@ -79,7 +79,7 @@ async def update_reputation(
             record.anomaly_sum += anomaly_score
             if anomaly_score >= settings.anomaly_threshold:
                 record.total_alerts += 1
-            record.last_seen = datetime.now(timezone.utc)
+            record.last_seen = datetime.now(timezone.utc).replace(tzinfo=None)
             record.tag = _compute_tag(record.reputation_score)
 
         await session.commit()

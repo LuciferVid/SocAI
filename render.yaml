@@ -1,0 +1,46 @@
+services:
+  # 1. The Main SOC API and Dashboard
+  - type: web
+    name: soc-api
+    plan: free
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MESSAGING_TYPE
+        value: redis
+      - key: DATABASE_URL
+        fromDatabase:
+          name: soc-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: soc-redis
+          property: connectionString
+
+  # 2. The Log Generator (as a background worker)
+  - type: worker
+    name: soc-generator
+    plan: free
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m generator.fake_logs
+    envVars:
+      - key: MESSAGING_TYPE
+        value: redis
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: soc-redis
+          property: connectionString
+
+# Infrastructure
+databases:
+  - name: soc-db
+    plan: free
+
+redis:
+  - name: soc-redis
+    plan: free
+    ipAllowList: [] # Allow internal access only

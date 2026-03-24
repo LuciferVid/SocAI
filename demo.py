@@ -235,7 +235,7 @@ async def process_event(event: dict):
 
 async def generate_loop():
     """Background task that generates and processes events."""
-    logger.info("starting event generator at ~10 eps")
+    logger.info("starting event generator at ~2 eps")
     import random
     from generator.fake_logs import generate_event, ATTACKER_IPS, _ddos_spike_event
 
@@ -252,9 +252,9 @@ async def generate_loop():
                 burst["source_ip"] = burst_ip
                 burst["raw_log"] = json.dumps(burst)
                 await process_event(burst)
-                await asyncio.sleep(0.02)
+                await asyncio.sleep(0.1)
 
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.5)
 
 
 _gen_task: asyncio.Task | None = None

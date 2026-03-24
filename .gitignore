@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# Logs
+*.log
+backend.log
+generator.log
+honeypot.log
+
+# Databases
+*.db
+demo_soc.db
+
+# IDEs
+.vscode/
+.idea/
+.DS_Store
+
+# Artifacts
+app/ml/artifacts/*.pkl
+app/ml/artifacts/*.pt
+
+# OS
+.DS_Store

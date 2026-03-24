@@ -1,5 +1,4 @@
-# AI Threat Detection System (Mini SOC)
-
+# AI Threat Detection System (Mini SOC) 
 A real-time, streaming AI-powered Security Operations Center that ingests logs via **Apache Kafka**, scores them with **ML anomaly detection models**, fires instant alerts, and surfaces everything on a **live dashboard**.
 
 ## Architecture
@@ -145,3 +144,71 @@ projectai/
 - **Attack Classification** — brute force, DDoS spike, suspicious API paths
 - **Self-Learning Loop** — mark false positives → retrain models → hot-swap
 - **Live Dashboard** — real-time event stream, alert feed, traffic charts via WebSockets
+
+## ☁️ Deployment
+
+### Option A: Free Tier (Lite Mode) — **Render**
+The "Lite Mode" replaces Kafka with **Redis Pub/Sub** to fit within free hosting limits (512MB RAM).
+
+[![Deploy to Render](https://render.com/images/deploy-to-render.svg)](https://render.com/deploy)
+
+1. **Click the button above** (or upload to your GitHub and use the `render.yaml` blueprint).
+2. Render will automatically provision:
+   - **FastAPI App** (Web Service)
+   - **Log Generator** (Background Worker)
+   - **PostgreSQL** & **Redis** (Managed)
+3. The system will automatically detect `MESSAGING_TYPE=redis` and start the Lite pipeline.
+
+### Option B: Full Production — **Cloud VPS (DigitalOcean/AWS)**
+Best for high-throughput environments where **Kafka** is required.
+
+### 1. Prepare Server
+```bash
+# Install Docker & Docker Compose on your server
+# Clone your repository
+git clone <your-repo-url>
+cd projectai
+```
+
+### 2. Configure Environment
+```bash
+cp .env.production .env
+# Edit .env to change passwords/secrets if necessary
+nano .env
+```
+
+### 3. Launch with Docker Compose
+```bash
+docker compose up --build -d
+```
+
+### 4. Initialize ML Models
+Since the models need to be trained once to generate artifacts:
+```bash
+docker compose exec app python -m app.ml.train
+```
+
+Navigate to `http://<your-server-ip>:8000/dashboard` to see your live SOC in production!
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `GET` | `/api/events/` | Paginated event listing (filters: `source_ip`, `min_score`, `attack_type`) |
+| `GET` | `/api/events/count` | Total event count |
+| `GET` | `/api/events/{id}` | Single event detail |
+| `PATCH` | `/api/events/{id}/label` | Label event for feedback loop |
+| `GET` | `/api/alerts/` | Alert listing (filters: `severity`, `resolved`) |
+| `GET` | `/api/alerts/stats` | Aggregate alert statistics |
+| `POST` | `/api/alerts/{id}/resolve` | Resolve alert (mark false positive) |
+| `GET` | `/api/reputation/{ip}` | IP reputation lookup |
+| `PATCH` | `/api/reputation/{ip}/tag` | Manual IP tag override |
+| `POST` | `/api/retrain/` | Trigger model retraining |
+| `WS` | `/ws/live` | Live event stream (WebSocket) |
+
+## Testing
+
+```bash
+pytest tests/ -v
+```

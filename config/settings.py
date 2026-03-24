@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     kafka_topic_alerts: str = "alerts"
     kafka_consumer_group: str = "soc-pipeline"
 
+    # --- Messaging ---
+    messaging_type: str = "kafka"  # "kafka" or "redis"
+
     # --- PostgreSQL ---
     database_url: str = "postgresql+asyncpg://soc_user:soc_pass_dev@localhost:5432/soc_db"
 

@@ -69,7 +69,7 @@ async def _process_message(raw_value: bytes):
 
     # step 4: persist to PostgreSQL
     event_record = Event(
-        timestamp=datetime.fromisoformat(parsed["timestamp"]),
+        timestamp=datetime.fromisoformat(parsed["timestamp"]).replace(tzinfo=None),
         source_ip=parsed["source_ip"],
         dest_ip=parsed.get("dest_ip"),
         method=parsed.get("method"),
@@ -119,33 +119,19 @@ async def _process_message(raw_value: bytes):
 
 async def _consume_loop():
     """Main consume loop — reads and processes messages one at a time."""
-    global _consumer
+    from app.services.messaging import get_messaging_provider
+    provider = get_messaging_provider()
+    await provider.start()
+    
+    logger.info("Starting consumer loop using %s", settings.messaging_type)
+    
+    async def handler(msg_value: bytes):
+        try:
+            await _process_message(msg_value)
+        except Exception:
+            logger.exception("Error processing message")
 
-    _consumer = AIOKafkaConsumer(
-        settings.kafka_topic_raw,
-        bootstrap_servers=settings.kafka_bootstrap_servers,
-        group_id=settings.kafka_consumer_group,
-        auto_offset_reset="latest",
-        enable_auto_commit=False,
-        value_deserializer=lambda v: v,  # raw bytes, decoded in _process_message
-    )
-    await _consumer.start()
-    logger.info(
-        "consumer started — group=%s topic=%s",
-        settings.kafka_consumer_group, settings.kafka_topic_raw,
-    )
-
-    try:
-        async for msg in _consumer:
-            try:
-                await _process_message(msg.value)
-            except Exception:
-                logger.exception("error processing message at offset %d", msg.offset)
-            # commit after each message (at-least-once semantics)
-            await _consumer.commit()
-    finally:
-        await _consumer.stop()
-        logger.info("consumer stopped")
+    await provider.consume(settings.kafka_topic_raw, handler)
 
 
 async def start_consumers():
