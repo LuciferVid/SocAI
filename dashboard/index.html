@@ -986,17 +986,18 @@
       ws.onmessage = (e) => {
         if(state.isPaused) return; // cache if wanted, but drop is easier for demo
         try {
-          const raw = JSON.parse(e.data);
+          const parsedData = JSON.parse(e.data);
+          const raw = parsedData.event || parsedData;
           // Handle both old backend format and requested format
           const payload = {
-            id: raw.event_id || Math.random().toString(),
-            time: raw.time || formatTime(new Date()), // backend might send timestamp ISO
-            ip: raw.ip || raw.source_ip || '0.0.0.0',
+            id: raw.id || raw.event_id || Math.random().toString(),
+            time: raw.timestamp || raw.time || formatTime(new Date()), // backend might send timestamp ISO
+            ip: raw.source_ip || raw.ip || '0.0.0.0',
             method: raw.method || 'GET',
             path: raw.path || '/',
             status: parseInt(raw.status || raw.status_code || 200),
-            score: parseFloat(raw.score !== undefined ? raw.score : (raw.anomaly_score || 0.0)),
-            type: raw.type || raw.attack_type || 'normal',
+            score: parseFloat(raw.anomaly_score !== undefined ? raw.anomaly_score : (raw.score || 0.0)),
+            type: raw.attack_type || raw.type || 'normal',
             rawJson: e.data
           };
           
