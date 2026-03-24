@@ -151,17 +151,17 @@ async def run_generator(
     - events_per_second: baseline throughput
     - total_events: if set, stop after N events; otherwise run forever
     """
-    from app.services.kafka_producer import produce, close_producer
+    from app.services.messaging import produce
     logger.info(
         "generator started — producing to %s at ~%.0f eps (using %s)",
-        settings.kafka_topic_raw, events_per_second, settings.messaging_type
+        settings.ingestion_topic, events_per_second, "redis"
     )
 
     count = 0
     try:
         while total_events is None or count < total_events:
             event = generate_event()
-            await produce(settings.kafka_topic_raw, event)
+            await produce(settings.ingestion_topic, event)
             count += 1
 
             if count % 100 == 0:
@@ -175,7 +175,7 @@ async def run_generator(
                     burst = _ddos_spike_event()
                     burst["source_ip"] = burst_ip
                     burst["raw_log"] = json.dumps(burst)
-                    await produce(settings.kafka_topic_raw, burst)
+                    await produce(settings.ingestion_topic, burst)
                     count += 1
 
             await asyncio.sleep(1.0 / events_per_second)

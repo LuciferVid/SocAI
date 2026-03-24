@@ -14,15 +14,8 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # --- Kafka ---
-    kafka_bootstrap_servers: str = "localhost:9092"
-    kafka_topic_raw: str = "logs.raw"
-    kafka_topic_scored: str = "logs.scored"
-    kafka_topic_alerts: str = "alerts"
-    kafka_consumer_group: str = "soc-pipeline"
-
     # --- Messaging ---
-    messaging_type: str = "kafka"  # "kafka" or "redis"
+    ingestion_topic: str = "logs.raw"
 
     # --- PostgreSQL ---
     database_url: str = "postgresql+asyncpg://soc_user:soc_pass_dev@localhost:5432/soc_db"

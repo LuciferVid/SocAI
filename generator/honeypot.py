@@ -19,7 +19,7 @@ producer = None
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Honeypot started — ingesting live traffic to %s (using %s)", settings.kafka_topic_raw, settings.messaging_type)
+    logger.info("Honeypot started — ingesting live traffic to %s (Redis Mode)", settings.ingestion_topic)
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -69,8 +69,8 @@ async def catch_all(request: Request, path: str):
     })
 
     # Produce to Messaging Layer
-    from app.services.kafka_producer import produce
-    await produce(settings.kafka_topic_raw, event)
+    from app.services.messaging import produce
+    await produce(settings.ingestion_topic, event)
     logger.info("Captured %s %s from %s", method, full_path, source_ip)
 
     # Return a fake generic response to keep scanners probing

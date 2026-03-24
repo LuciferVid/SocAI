@@ -42,17 +42,21 @@ async def lifespan(application: FastAPI):
     await redis_pool.ping()
     logger.info("redis connected")
 
-    # import here to avoid circular deps — consumers need redis & db
-    from app.services.kafka_consumer import start_consumers
-    await start_consumers()
+    # Start background worker for log processing
+    from app.services.worker import run_worker_task
+    application.state.worker_task = run_worker_task()
 
     logger.info("SOC pipeline is live")
     yield
 
     # --- shutdown ---
     logger.info("shutting down SOC pipeline")
-    from app.services.kafka_consumer import stop_consumers
-    await stop_consumers()
+    if hasattr(application.state, "worker_task"):
+        application.state.worker_task.cancel()
+        try:
+            await application.state.worker_task
+        except asyncio.CancelledError:
+            pass
 
     if redis_pool:
         await redis_pool.close()
@@ -62,17 +66,19 @@ async def lifespan(application: FastAPI):
 
 app = FastAPI(
     title="AI Threat Detection System",
-    description="Real-time SOC powered by streaming ML anomaly detection",
+    description="Real-time SOC powered by Redis streaming and ML anomaly detection",
     version="0.1.0",
     lifespan=lifespan,
 )
 
 # mount the live dashboard
 from fastapi.responses import HTMLResponse
+from pathlib import Path
 
 @app.get("/", response_class=HTMLResponse)
 async def get_landing():
-    with open("dashboard/landing.html", "r") as f:
+    landing_path = Path(__file__).parent.parent / "dashboard" / "landing.html"
+    with open(landing_path, "r") as f:
         return f.read()
 
 app.mount("/dashboard", StaticFiles(directory="dashboard", html=True), name="dashboard")
