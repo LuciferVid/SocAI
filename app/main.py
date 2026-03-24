@@ -68,6 +68,13 @@ app = FastAPI(
 )
 
 # mount the live dashboard
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+async def get_landing():
+    with open("dashboard/landing.html", "r") as f:
+        return f.read()
+
 app.mount("/dashboard", StaticFiles(directory="dashboard", html=True), name="dashboard")
 
 # register API routers
