@@ -4,6 +4,7 @@ Reads from .env file or environment variables — no hardcoded secrets.
 """
 
 from pathlib import Path
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,6 +21,15 @@ class Settings(BaseSettings):
 
     # --- PostgreSQL ---
     database_url: str = "postgresql+asyncpg://soc_user:soc_pass_dev@localhost:5432/soc_db"
+
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def fix_postgres_scheme(cls, v: str) -> str:
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif v.startswith("postgresql://") and not v.startswith("postgresql+asyncpg://"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        return v
 
     # --- Redis ---
     redis_url: str = "redis://localhost:6379/0"
