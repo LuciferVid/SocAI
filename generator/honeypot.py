@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request, Response
 import uvicorn
-from aiokafka import AIOKafkaProducer
+import uvicorn
 
 from config.settings import settings
 
@@ -14,7 +14,7 @@ logger = logging.getLogger("soc.honeypot")
 
 app = FastAPI(title="SOCAI Honeypot - Real Traffic Ingestion")
 
-# Global Kafka producer
+# Global producer
 producer = None
 
 @app.on_event("startup")
@@ -23,15 +23,13 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    from app.services.kafka_producer import close_producer
-    await close_producer()
     logger.info("Honeypot stopped")
 
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
 async def catch_all(request: Request, path: str):
     """
     Catches EVERY single HTTP request sent to this server,
-    packages it as a SOC event, and ships it to Kafka.
+    packages it as a SOC event, and ships it to the event bus.
     """
     source_ip = request.client.host if request.client else "127.0.0.1"
     

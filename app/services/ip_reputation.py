@@ -45,7 +45,7 @@ async def update_reputation(
 ):
     """
     Update the IP's reputation after a new event.
-    Called from the Kafka consumer pipeline for every scored event.
+    Called from the worker pipeline for every scored event.
     """
     # invert anomaly score: high anomaly -> low reputation contribution
     contribution = 1.0 - anomaly_score

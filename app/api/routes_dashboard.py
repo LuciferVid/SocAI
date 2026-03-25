@@ -42,7 +42,7 @@ async def websocket_live(ws: WebSocket):
 async def broadcast_event(payload: dict):
     """
     Push a scored event to all connected dashboard clients.
-    Called from the Kafka consumer after each event is processed.
+    Called from the background worker after each event is processed.
     """
     if not _connected_clients:
         return

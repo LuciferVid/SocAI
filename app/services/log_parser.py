@@ -1,6 +1,6 @@
 """
 Log parser and normalizer.
-Accepts raw log dicts (from Kafka) and extracts a common schema.
+Accepts raw log dicts and extracts a common schema.
 Handles structured JSON logs and falls back to regex for plain-text formats.
 """
 

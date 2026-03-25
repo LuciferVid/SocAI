@@ -1,6 +1,6 @@
 """
 FastAPI application factory with lifespan events.
-Boots up all async services (DB, Redis, Kafka consumers) on startup
+Boots up all async services (DB, Redis) on startup
 and tears them down cleanly on shutdown.
 """
 
