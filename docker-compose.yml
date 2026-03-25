@@ -46,9 +46,9 @@ services:
       redis:
         condition: service_healthy
 
-  generator:
+  sensor:
     build: .
-    command: ["python", "-m", "generator.fake_logs"]
+    command: ["python", "-m", "generator.sensor_agent"]
     environment:
       - REDIS_URL=redis://redis:6379/0
     depends_on:

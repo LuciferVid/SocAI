@@ -4,6 +4,7 @@ Boots up all async services (DB, Redis, Kafka consumers) on startup
 and tears them down cleanly on shutdown.
 """
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 

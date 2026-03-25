@@ -3,8 +3,8 @@ A real-time, streaming AI-powered Security Operations Center. It ingests logs vi
 
 ## Architecture
 
-```
-Simulated Logs → Redis Pub/Sub (ingestion) → Worker → Feature Engine → ML Scorer → PostgreSQL
+```text
+Network/Host Sensors → Redis Pub/Sub (ingestion) → Worker → Feature Engine → ML Scorer → PostgreSQL
                                                                         ↓
                                                                 Alert Dispatcher → Webhook / Email
                                                                         ↓
@@ -15,7 +15,7 @@ Simulated Logs → Redis Pub/Sub (ingestion) → Worker → Feature Engine → M
 
 | Decision | Rationale |
 |---|---|
-| **Redis Pub/Sub** | Ultra-low latency ingestion, fits perfectly in free-tier cloud environments (Render/Cloud). |
+| **Redis Pub/Sub** | Ultra-low latency ingestion, designed for high-throughput enterprise environments. |
 | **Redis Sorted Sets** | O(log N) sliding-window queries for real-time feature engineering. |
 | **Hybrid ML + Rules** | Deterministic rules catch known attacks (Brute Force, DDoS); ML isolates novel anomalies. |
 | **EWMA Reputation** | Exponentially Weighted Moving Average for dynamic IP reputation scoring. |
@@ -71,25 +71,14 @@ python -m app.ml.train
 ### 4. Launch SOC
 ```bash
 # Start API (Worker runs as a background task within the API process)
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 
-# Start Simulator (Separate Terminal)
-python -m generator.fake_logs
+# Start Network Sensor Agent (Separate Terminal)
+python -m generator.sensor_agent
 ```
 
 ### 5. Access Dashboard
-Navigate to **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)** to see live events and alerts.
-
-## ☁️ Deployment (Cloud Ready)
-
-### Deploy to Render (Free Tier)
-This project is optimized for **Render**. It uses Redis to maintain high performance within free 512MB RAM limits.
-
-[![Deploy to Render](https://render.com/images/deploy-to-render.svg)](https://render.com/deploy)
-
-1. Use the `render.yaml` blueprint.
-2. Render provisions **FastAPI Web Service**, **Background Worker**, **PostgreSQL**, and **Redis** automatically.
-3. Your SOC will be live in minutes.
+Navigate to **[http://localhost:8000](http://localhost:8000)** to see the SOCAI platform and live dashboard.
 
 ---
-**Jai Hind! 🇮🇳 Developed for high-performance security monitoring.**
+**© 2026 SOCAI Inc. Proprietary and Confidential.**
