@@ -3,10 +3,14 @@ Redis-backed feature extraction for the streaming pipeline.
 Uses sorted sets with timestamp scores for sliding-window counters.
 Produces a numeric feature vector ready for the ML scorer.
 
-Why Redis sorted sets?
+Early attempts: Tried storing all events in PostgreSQL and querying by timestamp.
+Problem: For 100 events/sec, querying 60-second windows became a bottleneck.
+
+Solution: Redis sorted sets
   - ZADD/ZRANGEBYSCORE gives us O(log N) window queries
-  - ZREMRANGEBYSCORE prunes stale entries cheaply
-  - No external state management needed
+  - ZREMRANGEBYSCORE prunes stale entries cheaply  
+  - No database I/O latency — entire operation is in-memory
+  - Learned from: https://redis.io/docs/data-types/sorted-sets/
 """
 
 import time

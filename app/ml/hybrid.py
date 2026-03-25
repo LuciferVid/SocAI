@@ -1,7 +1,18 @@
 """
 Phase 3 — Hybrid detection: deterministic rules + ML anomaly score.
-Rules catch obvious patterns (brute force, DDoS); ML catches subtle anomalies.
-Combined score = weighted sum with configurable blend.
+
+Initial approach: ML model alone (Isolation Forest).
+Problem: Missed obvious brute-force attacks with very predictable patterns.
+Solution: Add deterministic rule layer that fires on specific behaviors:
+  - Brute force: 10+ failed auths in 60s on same IP
+  - DDoS: 40+ requests/sec from single source
+  - Scanner: Known exploit paths
+
+This hybrid approach avoids false negatives on known attacks while 
+letting ML catch novel patterns the rules don't cover.
+
+Combined score = weighted sum (rule_weight=0.4, ml_weight=0.6)
+You can tune these weights based on your false positive tolerance.
 """
 
 import logging

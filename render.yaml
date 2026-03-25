@@ -5,7 +5,7 @@ services:
   - type: web
     name: soc-api
     env: python
-    region: ohio
+    region: ap-southeast-1
     plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
@@ -26,7 +26,7 @@ services:
   - type: worker
     name: soc-worker
     env: python
-    region: ohio
+    region: ap-southeast-1
     plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python -m generator.sensor_agent"
@@ -42,14 +42,14 @@ services:
   # 3. Redis Message Broker
   - type: redis
     name: soc-redis
-    region: ohio
+    region: ap-southeast-1
     plan: free
     ipAllowList: [] # internal only
 
 databases:
   # 4. PostgreSQL Database
   - name: soc_db
-    region: ohio
+    region: ap-southeast-1
     plan: free
     databaseName: socai
     user: socadmin

@@ -1,46 +1,77 @@
-# SocAI: Final Walkthrough (Redis-Only Lite Version)
+# SocAI: Architecture Evolution & Implementation
 
-The **SocAI** project is now transformed into a high-performance, lightweight SOC optimized for free-tier hosting!
+This document outlines the design decisions and technical challenges encountered while building a real-time threat detection system.
 
-## What We Accomplished
+## Key Architectural Decisions
 
-### 1. **Complete Kafka Removal**
--   Purged all Kafka and Zookeeper dependencies.
--   Refactored the core messaging layer to use **Redis Pub/Sub** exclusively.
--   Reduced system RAM requirements by over 1.5GB, making it perfect for free hosting.
+### 1. **Streaming with Redis Pub/Sub**
 
-### 2. **Generic Log Pipeline**
--   Created a provider-agnostic `MessagingService`.
--   Implemented a background worker that handles log parsing, feature extraction, and ML scoring in real-time.
+Initially considered Kafka for enterprise-grade streaming, but chose Redis Pub/Sub for:
 
-### 3. **Professional Rebranding**
--   Renamed "Fake Logs" to **"Simulated Audit Logs"** for internship appeal.
--   Completely scrubbed all Kafka mentions from the documentation and configuration.
--   Added a premium **Landing Page** at the root `/` route.
+- **Simplicity** - Single binary, built-in persistence, lower operational overhead
+- **Cost** - Free-tier deployments (Render) provide Redis without separate Kafka cluster
+- **Real-time features** - Redis sorted sets enable O(log N) sliding-window queries for feature engineering
+- **Embedded worker** - No need for separate consumer group management
 
-## Final Repository Structure
+This trade-off accepts higher throughput limits but gains developer velocity for a prototype.
 
-```
-SocAI/
-├── app/
-│   ├── main.py              # FastAPI Entry Point
-│   ├── services/
-│   │   ├── messaging.py     # Redis Pub/Sub Service
-│   │   └── worker.py        # Log Processing Worker
-├── generator/
-│   └── fake_logs.py         # Traffic Simulator (Simulated Audit Logs)
-├── dashboard/               # Live V2 Dashboard & Landing Page
-├── render.yaml              # One-Click Cloud Deployment
-└── README.md                # Technical Documentation
-```
+### 2. **Async/Await with SQLAlchemy**
 
-## Proof of Work
+Used asyncpg + async SQLAlchemy for:
 
-### ✅ Verified Data Flow
-The event count is increasing live on the dashboard, confirming that the Redis-based ingestion pipeline is fully operational.
+- Non-blocking I/O during database operations (critical for 60+ second Render startup)
+- Concurrent request handling without thread pools
+- Better resource utilization on free-tier hosting
 
-### ✅ Infrastructure Cleanup
-`docker-compose.yml` and `requirements.txt` are now 100% clean of Kafka/Zookeeper bloat.
+### 3. **Dual ML Approach (Hybrid Scoring)**
 
----
-**Jai Hind! 🇮🇳 Your project is now sleek, modern, and ready for deployment.**
+Rather than a single model:
+
+- **Isolation Forest** - Fast, unseeded anomaly detection (Phase 1)
+- **Autoencoder** - Learns reconstruction patterns, catches novel attacks (Phase 2)
+- **Rule Engine** - Deterministic brute-force & DDoS detection (Phase 3)
+
+Hybrid approach ensures both known and unknown attack patterns are detected without excessive false positives.
+
+## Implementation Lessons
+
+### Streaming Pipeline
+
+The core challenge was ingesting logs → extracting features → scoring → persisting without bottlenecks.
+
+Solution: Background worker task that consumes from Redis, maintains sliding-window aggregates in Redis (sorted sets), extracts features on-demand, and scores with reloadable models.
+
+### Model Reloading
+
+Instead of restarting the service for model updates, implemented **hot-swap reload** via `/api/retrain` endpoint:
+
+1. Trigger retraining with new labeled data
+2. Save models to disk
+3. Main scorer reloads without downtime
+
+### Feature Engineering
+
+Real-time feature extraction required:
+
+- Sliding-window counters (1m, 5m, 15m)
+- Per-IP request frequency and error rates
+- Burst detection (requests/sec)
+
+Used Redis sorted sets with timestamp scores for O(log N) range queries instead of polling PostgreSQL.
+
+## Deployment on Render
+
+### Free Tier Constraints
+
+- Single-threaded Python on free tier
+- PostgreSQL boot time can exceed 50 seconds
+- Added retry loop to wait for database availability
+
+### Production Considerations
+
+For enterprise deployment:
+
+- Switch to managed Kafka for higher throughput
+- Add dedicated ML inference service (GPU-accelerated)
+- Implement multi-region failover
+- Use time-series database (ClickHouse / Timescale) for metrics

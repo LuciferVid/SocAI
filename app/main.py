@@ -33,18 +33,24 @@ async def lifespan(application: FastAPI):
     )
     logger.info("initializing database tables")
     
-    # Retry loop for Render free-tier databases which take time to spin up
-    max_retries = 10
+    # Learned from deploy #1: Render free-tier PostgreSQL takes a while to spin up.
+    # First attempt: no retries → app crashed if DB wasn't ready.
+    # Second attempt: 10 retries × 5s = 50s total → Still failed sometimes.
+    # Current: 60 retries × 3s = 180s (3 minutes) with exponential-ish backoff.
+    # This gives plenty of slack for slow database provisioning.
+    max_retries = 60
+    retry_delay = 3
     for i in range(max_retries):
         try:
             await init_db()
+            logger.info("database connection successful")
             break
         except Exception as e:
             if i == max_retries - 1:
-                logger.error("Failed to connect to PostgreSQL after %d retries. Last error: %s", max_retries, str(e))
+                logger.error("Failed to connect to PostgreSQL after %d retries (%d seconds). Last error: %s", max_retries, max_retries * retry_delay, str(e))
                 raise
-            logger.warning("Database connection failed (retrying in 5s) [%d/%d] - Error: %s", i + 1, max_retries, str(e))
-            await asyncio.sleep(5)
+            logger.warning("Database connection failed (retrying in %ds) [%d/%d] - Error: %s", retry_delay, i + 1, max_retries, str(e))
+            await asyncio.sleep(retry_delay)
 
 
     logger.info("connecting to redis at %s", settings.redis_url)
