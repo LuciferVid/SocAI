@@ -11,7 +11,6 @@ import random
 import logging
 from datetime import datetime, timezone
 
-from aiokafka import AIOKafkaProducer
 
 from config.settings import settings
 
