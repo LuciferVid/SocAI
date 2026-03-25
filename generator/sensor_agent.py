@@ -180,7 +180,6 @@ async def run_generator(
 
             await asyncio.sleep(1.0 / events_per_second)
     finally:
-        await close_producer()
         logger.info("generator stopped after %d events", count)
 
 

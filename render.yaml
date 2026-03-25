@@ -22,23 +22,6 @@ services:
           name: soc-redis
           property: connectionString
 
-  # 2. Log Generator & ML Processor (Background Worker)
-  - type: worker
-    name: soc-worker
-    env: python
-    region: singapore
-    plan: free
-    buildCommand: "pip install -r requirements.txt && python -m app.ml.train"
-    startCommand: "python -m generator.sensor_agent"
-    envVars:
-      - key: MESSAGING_TYPE
-        value: redis
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: soc-redis
-          property: connectionString
-
   # 3. Redis Message Broker
   - type: redis
     name: soc-redis
