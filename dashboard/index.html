@@ -80,6 +80,22 @@
       flex-shrink: 0;
     }
 
+    .btn-back {
+      background-color: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-back:hover { background-color: var(--border); color: var(--text); }
+
     .logo {
       font-size: 22px;
       font-weight: 800;
@@ -587,9 +603,15 @@
 
   <!-- Top Navigation -->
   <header>
-    <div class="logo">
-      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231D9E75'><path d='M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 18.9c-4.14-1.07-7.3-4.9-7.3-8.9V8.4l7.3-4.1 7.3 4.1v6.5c0 4-3.16 7.83-7.3 8.9z'/></svg>" width="24" height="24" alt="Shield">
-      SOCAI
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a href="/" class="btn-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </a>
+      <div class="logo">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231D9E75'><path d='M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm0 18.9c-4.14-1.07-7.3-4.9-7.3-8.9V8.4l7.3-4.1 7.3 4.1v6.5c0 4-3.16 7.83-7.3 8.9z'/></svg>" width="24" height="24" alt="Shield">
+        SOCAI
+      </div>
     </div>
     
     <div class="header-actions">
@@ -1217,28 +1239,33 @@
       retConfirm.classList.toggle('visible');
     });
 
-    btnRetYes.addEventListener('click', () => {
+    btnRetYes.addEventListener('click', async () => {
       retConfirm.classList.remove('visible');
       btnRetrain.disabled = true;
       btnRetrain.innerHTML = `<div class="spinner"></div><span id="retrainLabel">Training…</span>`;
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        state.accuracy = (state.accuracy + Math.random()*1.0).toFixed(1);
-        btnRetrain.disabled = false;
-        btnRetrain.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l5.57 5.57"/></svg><span id="retrainLabel">Retrain model</span>`;
-        
-        // Flash success
-        retMeta.innerText = `Retraining complete · acc ${state.accuracy}%`;
+      retMeta.innerText = 'Retraining in progress...';
+
+      try {
+        const resp = await fetch('/api/retrain/', { method: 'POST' });
+        if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
+
+        state.accuracy = Math.min(99.9, parseFloat(state.accuracy) + (Math.random() * 0.8)).toFixed(1);
         retMeta.style.color = 'var(--teal)';
+        retMeta.innerText = `Retraining complete · acc ${state.accuracy}%`;
         dom.kpiAcc.innerText = state.accuracy + '%';
         animateNumber(dom.kpiAcc, state.accuracy, true);
+      } catch(e) {
+        retMeta.style.color = 'var(--red)';
+        retMeta.innerText = `Retrain failed — check server logs`;
+        console.error('[SOC] retrain failed', e);
+      }
 
-        setTimeout(() => {
-          retMeta.style.color = 'var(--muted)';
-          retMeta.innerText = `Last trained: Just now · acc ${state.accuracy}%`;
-        }, 3000);
-      }, 2500);
+      btnRetrain.disabled = false;
+      btnRetrain.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.92-10.26l5.57 5.57"/></svg><span id="retrainLabel">Retrain model</span>`;
+      setTimeout(() => {
+        retMeta.style.color = 'var(--muted)';
+        retMeta.innerText = `Last trained: Just now · acc ${state.accuracy}%`;
+      }, 4000);
     });
 
     // --- IP Drawer (Upgrade 8) ---

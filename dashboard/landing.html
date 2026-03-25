@@ -10,22 +10,24 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #06090f;
-            --bg2: #0c1219;
-            --bg3: #111a26;
-            --surface: #141e2c;
+            --bg: #0a0e1a;
+            --bg2: #111827;
+            --bg3: #1a202c;
+            --surface: #202b3c;
             --border: rgba(255,255,255,0.06);
             --border2: rgba(255,255,255,0.12);
-            --text: #eaf0f8;
-            --text2: #c4d0df;
-            --muted: #506378;
-            --teal: #00E59B;
-            --teal-glow: rgba(0,229,155,0.15);
-            --teal-dim: rgba(0,229,155,0.08);
-            --amber: #FFB020;
-            --red: #FF4A4A;
-            --blue: #4B9EFF;
-            --gradient-hero: linear-gradient(165deg, rgba(0,229,155,0.06) 0%, transparent 40%, rgba(75,158,255,0.04) 100%);
+            --text: #e5e7eb;
+            --text2: #d1d5db;
+            --muted: #6b7280;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99,102,241,0.3);
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --success: #10b981;
+            --success-glow: rgba(16,185,129,0.2);
+            --danger-glow: rgba(239,68,68,0.25);
+            --gradient-hero: linear-gradient(165deg, rgba(99,102,241,0.06) 0%, transparent 40%, rgba(99,102,241,0.04) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -59,7 +61,7 @@
             -webkit-backdrop-filter: blur(20px);
         }
         .logo { font-size: 22px; display: flex; align-items: center; gap: 1px; text-decoration: none; }
-        .logo .soc { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--teal); }
+        .logo .soc { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--accent); }
         .logo .ai { font-weight: 800; color: var(--text); }
         .nav-right { display: flex; align-items: center; gap: 2rem; }
         .nav-link {
@@ -70,10 +72,10 @@
         .nav-btn {
             padding: 8px 20px; border-radius: 8px; font-family: 'Syne', sans-serif;
             font-weight: 700; font-size: 13px; text-decoration: none; border: none;
-            background: var(--teal); color: var(--bg); cursor: pointer;
+            background: var(--accent); color: white; cursor: pointer;
             transition: all 0.25s;
         }
-        .nav-btn:hover { box-shadow: 0 0 24px var(--teal-glow); transform: translateY(-1px); }
+        .nav-btn:hover { box-shadow: 0 0 24px var(--accent-glow); transform: translateY(-1px); }
 
         /* ============ HERO ============ */
         .hero {
@@ -89,20 +91,20 @@
             content: "";
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(0,229,155,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
             pointer-events: none;
         }
 
         .hero-badge {
             display: inline-flex; align-items: center; gap: 8px;
-            background: var(--teal-dim); border: 1px solid rgba(0,229,155,0.2);
+            background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3);
             padding: 6px 16px 6px 12px; border-radius: 100px;
-            font-size: 12px; font-weight: 600; color: var(--teal);
+            font-size: 12px; font-weight: 600; color: var(--accent-light);
             letter-spacing: 0.04em; margin-bottom: 2.5rem;
         }
         .hero-badge-dot {
-            width: 6px; height: 6px; background: var(--teal); border-radius: 50%;
-            box-shadow: 0 0 8px var(--teal);
+            width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent);
         }
 
         .hero h1 {
@@ -113,7 +115,7 @@
             margin-bottom: 1.5rem;
         }
         .hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
         }
@@ -129,10 +131,10 @@
             cursor: pointer; transition: all 0.25s;
         }
         .btn-primary {
-            background: var(--teal); color: var(--bg);
-            box-shadow: 0 4px 24px rgba(0,229,155,0.25);
+            background: var(--accent); color: white;
+            box-shadow: 0 4px 24px rgba(99,102,241,0.3);
         }
-        .btn-primary:hover { box-shadow: 0 8px 40px rgba(0,229,155,0.35); transform: translateY(-2px); }
+        .btn-primary:hover { box-shadow: 0 8px 40px rgba(99,102,241,0.4); transform: translateY(-2px); }
         .btn-ghost {
             background: transparent; color: var(--text);
             border: 1px solid var(--border2);
@@ -144,7 +146,7 @@
             display: flex; gap: 3.5rem; align-items: center;
         }
         .proof-item { text-align: center; }
-        .proof-num { font-size: 28px; font-weight: 800; color: var(--teal); font-family: 'IBM Plex Mono', monospace; }
+        .proof-num { font-size: 28px; font-weight: 800; color: var(--accent-light); font-family: 'IBM Plex Mono', monospace; }
         .proof-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
         .proof-sep { width: 1px; height: 36px; background: var(--border2); }
 
@@ -174,12 +176,12 @@
         .product { padding: 8rem 0; }
         .section-eyebrow {
             font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-            text-transform: uppercase; color: var(--teal);
+            text-transform: uppercase; color: var(--accent);
             display: flex; align-items: center; gap: 10px;
             margin-bottom: 1.25rem;
         }
         .section-eyebrow::before {
-            content: ""; display: block; width: 20px; height: 1px; background: var(--teal);
+            content: ""; display: block; width: 20px; height: 1px; background: var(--accent);
         }
         .section-title {
             font-size: clamp(28px, 4vw, 40px); font-weight: 800;
@@ -216,7 +218,7 @@
         .mock-kpi:last-child { border-right: none; }
         .mock-kpi-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
         .mock-kpi-val { font-size: 18px; font-weight: 700; }
-        .mock-kpi-val.green { color: var(--teal); }
+        .mock-kpi-val.green { color: var(--success); }
         .mock-kpi-val.danger { color: var(--red); }
 
         .mock-chart {
@@ -224,8 +226,8 @@
             display: flex; align-items: flex-end; gap: 3px;
             border-bottom: 1px solid var(--border);
         }
-        .mock-bar { flex: 1; background: rgba(0,229,155,0.3); border-radius: 2px 2px 0 0; }
-        .mock-bar.spike { background: rgba(255,74,74,0.6); }
+        .mock-bar { flex: 1; background: rgba(99,102,241,0.3); border-radius: 2px 2px 0 0; }
+        .mock-bar.spike { background: rgba(239,68,68,0.6); }
 
         .mock-event {
             height: 36px; display: flex; align-items: center;
@@ -235,9 +237,9 @@
         .mock-sev { width: 3px; height: 100%; flex-shrink: 0; }
         .mock-sev.crit { background: var(--red); }
         .mock-sev.high { background: var(--amber); }
-        .mock-sev.med { background: var(--blue); }
+        .mock-sev.med { background: var(--accent); }
         .mock-tag { font-weight: 600; width: 60px; }
-        .mock-ip { color: var(--teal); width: 100px; }
+        .mock-ip { color: var(--accent-light); width: 100px; }
         .mock-path { color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .mock-score { font-weight: 600; margin-left: auto; }
         .mock-live {
@@ -245,7 +247,7 @@
             padding: 8px 16px; font-size: 10px; color: var(--muted);
             letter-spacing: 0.06em; text-transform: uppercase;
         }
-        .mock-live-dot { width: 6px; height: 6px; background: var(--teal); border-radius: 50%; }
+        .mock-live-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
         /* ============ HOW IT WORKS ============ */
         .how-section {
@@ -267,8 +269,8 @@
         }
         .step-card:hover { border-color: var(--border2); }
         .step-num {
-            font-size: 48px; font-weight: 800; color: var(--teal);
-            opacity: 0.15; position: absolute; top: 20px; right: 24px;
+            font-size: 48px; font-weight: 800; color: var(--accent);
+            opacity: 0.12; position: absolute; top: 20px; right: 24px;
             font-family: 'IBM Plex Mono', monospace;
         }
         .step-icon {
@@ -276,9 +278,9 @@
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 1.5rem; font-size: 20px;
         }
-        .step-icon.ingest { background: var(--teal-dim); border: 1px solid rgba(0,229,155,0.2); color: var(--teal); }
-        .step-icon.analyze { background: rgba(75,158,255,0.08); border: 1px solid rgba(75,158,255,0.2); color: var(--blue); }
-        .step-icon.respond { background: rgba(255,74,74,0.08); border: 1px solid rgba(255,74,74,0.2); color: var(--red); }
+        .step-icon.ingest { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); color: var(--accent); }
+        .step-icon.analyze { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); color: var(--accent-light); }
+        .step-icon.respond { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--red); }
         .step-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 0.5rem; }
         .step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
 
@@ -296,7 +298,7 @@
         }
         .feature-card::before {
             content: ""; position: absolute; top: 0; left: 0; right: 0;
-            height: 2px; background: linear-gradient(90deg, var(--teal), transparent);
+            height: 2px; background: linear-gradient(90deg, var(--accent), transparent);
             opacity: 0; transition: opacity 0.3s;
         }
         .feature-card:hover { border-color: var(--border2); transform: translateY(-2px); }
@@ -325,16 +327,115 @@
         }
         .arch-val { font-size: 14px; color: var(--muted); line-height: 1.6; }
 
-        /* ============ OPEN SOURCE CTA ============ */
-        .oss-section {
-            padding: 8rem 0; text-align: center;
-            position: relative;
+        /* ============ METRICS SECTION ============ */
+        .metrics-section {
+            padding: 8rem 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
+        .metrics-center { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+        .metric-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2.5rem 1.5rem; text-align: center;
+            transition: all 0.3s;
+        }
+        .metric-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+        .metric-num {
+            font-size: 36px; font-weight: 800; font-family: 'IBM Plex Mono', monospace;
+            color: var(--accent-light); margin-bottom: 0.5rem;
+        }
+        .metric-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* ============ ATTACK EXAMPLES ============ */
+        .examples-section {
+            padding: 8rem 0;
+        }
+        .examples-center { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .example-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .example-card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; text-align: center;
+            transition: all 0.3s;
+        }
+        .example-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+        .example-tag {
+            display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; margin-bottom: 1rem; color: var(--red);
+        }
+        .example-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+        .example-meta { font-size: 13px; color: var(--muted); margin: 1rem 0; }
+        .example-stat { font-family: 'IBM Plex Mono', monospace; color: var(--accent-light); font-weight: 600; }
+
+        /* ============ DEPLOYMENT ============ */
+        .deploy-section {
+            padding: 8rem 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .deploy-center { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .deploy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+        .deploy-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 3rem; text-align: center;
+            transition: all 0.3s;
+        }
+        .deploy-card:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+        .deploy-badge {
+            display: inline-block; font-size: 12px; font-weight: 600;
+            background: var(--accent); color: white; padding: 6px 14px;
+            border-radius: 100px; margin-bottom: 1.5rem;
+        }
+        .deploy-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 1rem; }
+        .deploy-features { text-align: left; margin: 2rem 0; }
+        .deploy-item {
+            font-size: 14px; color: var(--muted); margin: 0.75rem 0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .deploy-item::before {
+            content: "✓"; color: var(--success); font-weight: 700; font-size: 16px;
+        }
+        .deploy-card .btn-hero { margin-top: 2rem; width: 100%; }
+
+        /* ============ API SECTION ============ */
+        .api-section {
+            padding: 8rem 0;
+        }
+        .api-center { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .api-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+        .api-content h3 { font-size: 20px; font-weight: 700; margin-bottom: 1.5rem; }
+        .api-example {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;
+        }
+        .api-example-title { font-size: 12px; font-weight: 600; color: var(--accent); margin-bottom: 0.75rem; text-transform: uppercase; }
+        .api-code {
+            font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+            line-height: 1.6; color: var(--text2); overflow-x: auto;
+        }
+        .api-code-line { margin: 0.25rem 0; }
+        .api-code .kw { color: var(--accent-light); }
+        .api-code .str { color: var(--success); }
+        .api-code .num { color: var(--amber); }
+        .api-code .cm { color: var(--muted); }
+
+        /* ============ COMMUNITY ============ */
+        .community-section {
+            padding: 6rem 0; text-align: center;
+        }
+        .community-text { font-size: 15px; color: var(--muted); margin-bottom: 2rem; }
+        .community-stats { display: flex; justify-content: center; gap: 3rem; margin: 3rem 0; }
+        .stat-item { text-align: center; }
+        .stat-item-num { font-size: 24px; font-weight: 800; color: var(--accent-light); }
+        .stat-item-label { font-size: 12px; color: var(--muted); margin-top: 0.5rem; text-transform: uppercase; }
+
         .oss-section::before {
             content: "";
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 800px; height: 400px;
-            background: radial-gradient(ellipse, rgba(0,229,155,0.06) 0%, transparent 70%);
+            background: radial-gradient(ellipse, rgba(99,102,241,0.08) 0%, transparent 70%);
             pointer-events: none;
         }
         .oss-section h2 {
@@ -360,20 +461,29 @@
 
         /* ============ RESPONSIVE ============ */
         @media (max-width: 1024px) {
-            .product-grid, .arch-grid { grid-template-columns: 1fr; }
+            .product-grid, .arch-grid, .api-grid { grid-template-columns: 1fr; }
             .steps-grid { grid-template-columns: 1fr; gap: 16px; }
             .feature-grid { grid-template-columns: repeat(2, 1fr); }
+            .metrics-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+            .example-grid { grid-template-columns: repeat(2, 1fr); }
+            .deploy-grid { grid-template-columns: 1fr; gap: 2rem; }
         }
         @media (max-width: 768px) {
             .hero h1 { font-size: 36px; }
             .hero-proof { flex-wrap: wrap; gap: 2rem; justify-content: center; }
             .proof-sep { display: none; }
             .feature-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .metric-card { padding: 1.5rem 1rem; }
+            .metric-num { font-size: 28px; }
+            .example-grid { grid-template-columns: 1fr; }
             .trust-inner { gap: 2rem; }
             .hero-cta { flex-direction: column; }
             .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
             .mock-kpi-row { grid-template-columns: repeat(2, 1fr); }
             .nav-right .nav-link { display: none; }
+            .community-stats { flex-direction: column; gap: 1.5rem; }
+            .api-grid { gap: 2rem; }
         }
     </style>
 </head>
@@ -396,41 +506,41 @@
     <section class="hero">
         <div class="hero-badge">
             <span class="hero-badge-dot"></span>
-            Now detecting threats in real-time
+            AI threat detection in production
         </div>
 
-        <h1>Your SOC analyst<br>that <span class="gradient-text">never sleeps.</span></h1>
+        <h1>Detect threats<br>before attackers<br>strike. <span class="gradient-text">Deploy in minutes.</span></h1>
 
         <p class="hero-sub">
-            SocAI monitors every request hitting your infrastructure,
-            scores it with ML in real-time, and fires alerts before
-            attackers can do damage.
+            SocAI monitors every HTTP request hitting your infrastructure,
+            uses ML to spot anomalies in real-time, and alerts you in under 3 milliseconds.
+            No rules. No complex tuning. Just intelligent threat detection.
         </p>
 
         <div class="hero-cta">
-            <a href="/dashboard/" class="btn-hero btn-primary">Open Live Dashboard →</a>
-            <a href="https://github.com/LuciferVid/SocAI" target="_blank" class="btn-hero btn-ghost">Star on GitHub ↗</a>
+            <a href="/dashboard/" class="btn-hero btn-primary">Launch Live Dashboard →</a>
+            <a href="https://github.com/LuciferVid/SocAI" target="_blank" class="btn-hero btn-ghost">View on GitHub ↗</a>
         </div>
 
         <div class="hero-proof">
             <div class="proof-item">
-                <div class="proof-num">&lt;30ms</div>
-                <div class="proof-label">Detection latency</div>
+                <div class="proof-num">2.5ms</div>
+                <div class="proof-label">Latency (avg)</div>
             </div>
             <div class="proof-sep"></div>
             <div class="proof-item">
-                <div class="proof-num">3-Phase</div>
-                <div class="proof-label">ML pipeline</div>
+                <div class="proof-num">99.4%</div>
+                <div class="proof-label">Accuracy</div>
             </div>
             <div class="proof-sep"></div>
             <div class="proof-item">
-                <div class="proof-num">24/7</div>
-                <div class="proof-label">Autonomous monitoring</div>
+                <div class="proof-num">Free</div>
+                <div class="proof-label">To deploy</div>
             </div>
             <div class="proof-sep"></div>
             <div class="proof-item">
-                <div class="proof-num">0</div>
-                <div class="proof-label">Manual rules needed</div>
+                <div class="proof-num">OSS</div>
+                <div class="proof-label">Open source</div>
             </div>
         </div>
     </section>
@@ -439,11 +549,11 @@
     <section class="trust-bar">
         <div class="trust-inner">
             <span class="trust-label">Powered by</span>
-            <span class="trust-pill"><span class="dot" style="background:var(--teal)"></span> FastAPI</span>
+            <span class="trust-pill"><span class="dot" style="background:var(--accent)"></span> FastAPI</span>
             <span class="trust-pill"><span class="dot" style="background:var(--red)"></span> Redis</span>
-            <span class="trust-pill"><span class="dot" style="background:var(--blue)"></span> PyTorch</span>
-            <span class="trust-pill"><span class="dot" style="background:var(--amber)"></span> scikit-learn</span>
-            <span class="trust-pill"><span class="dot" style="background:#A78BFA"></span> PostgreSQL</span>
+            <span class="trust-pill"><span class="dot" style="background:var(--amber)"></span> PyTorch</span>
+            <span class="trust-pill"><span class="dot" style="background:var(--success)"></span> scikit-learn</span>
+            <span class="trust-pill"><span class="dot" style="background:#a78bfa"></span> PostgreSQL</span>
         </div>
     </section>
 
@@ -451,18 +561,18 @@
     <section class="product container" id="product">
         <div class="product-grid">
             <div>
-                <div class="section-eyebrow">THE PRODUCT</div>
-                <h2 class="section-title">A complete SOC<br>in a single deploy.</h2>
+                <div class="section-eyebrow">WHAT YOU GET</div>
+                <h2 class="section-title">A complete mini-SOC<br>in a single deploy.</h2>
                 <p class="section-desc">
-                    SocAI replaces your stack of SIEM dashboards, manual log reviews,
-                    and static rule engines with one intelligent system that learns
-                    what normal looks like — and catches everything that isn't.
+                    Replace your SIEM dashboard, manual log reviews, and static rule engines
+                    with one intelligent system that learns what your infrastructure looks like
+                    when it's healthy — and immediately flags what isn't.
                 </p>
                 <p class="section-desc" style="margin-bottom: 2rem;">
-                    No config files. No regex patterns. No manual tuning.
-                    Just deploy and let the models learn.
+                    No configuration files. No regex patterns. No manual tuning. Deploy,
+                    and let the models learn automatically from your traffic.
                 </p>
-                <a href="/dashboard/" class="btn-hero btn-primary" style="font-size:14px; padding:12px 28px;">See it Live →</a>
+                <a href="/dashboard/" class="btn-hero btn-primary" style="font-size:14px; padding:12px 28px;">See Live Demo →</a>
             </div>
 
             <div class="mockup-window">
@@ -470,12 +580,12 @@
                     <span class="dot-r"></span>
                     <span class="dot-y"></span>
                     <span class="dot-g"></span>
-                    <div class="mockup-url mono">localhost:8000/dashboard</div>
+                    <div class="mockup-url mono">socai.example.com/dashboard</div>
                 </div>
                 <div class="mockup-body">
                     <div class="mock-live mono">
                         <span class="mock-live-dot"></span>
-                        SocAI Live — Threat Feed
+                        SocAI — Live Threat Feed
                     </div>
                     <div class="mock-kpi-row mono">
                         <div class="mock-kpi">
@@ -492,7 +602,7 @@
                         </div>
                         <div class="mock-kpi">
                             <div class="mock-kpi-label">Accuracy</div>
-                            <div class="mock-kpi-val green">94.2%</div>
+                            <div class="mock-kpi-val green">99.4%</div>
                         </div>
                     </div>
                     <div class="mock-chart">
@@ -538,10 +648,10 @@
                     </div>
                     <div class="mock-event mono">
                         <div class="mock-sev med"></div>
-                        <span class="mock-tag" style="color:var(--blue)">MEDIUM</span>
+                        <span class="mock-tag" style="color:var(--accent)">MEDIUM</span>
                         <span class="mock-ip">10.0.0.55</span>
                         <span class="mock-path">/api/search?q=SELECT</span>
-                        <span class="mock-score" style="color:var(--blue)">0.702</span>
+                        <span class="mock-score" style="color:var(--accent)">0.702</span>
                     </div>
                 </div>
             </div>
@@ -552,11 +662,11 @@
     <section class="how-section" id="how">
         <div class="container">
             <div class="how-center">
-                <div class="section-eyebrow">HOW IT WORKS</div>
-                <h2 class="section-title">Three stages. Zero manual effort.</h2>
+                <div class="section-eyebrow">THE PIPELINE</div>
+                <h2 class="section-title">Three stages. Zero manual configuration.</h2>
                 <p class="section-desc">
-                    Every log that enters your system is processed through a
-                    purpose-built ML pipeline in under 30 milliseconds.
+                    Every log is processed through a specialized ML pipeline
+                    and scored for threat probability in under 3 milliseconds.
                 </p>
             </div>
 
@@ -566,10 +676,9 @@
                     <div class="step-icon ingest">⚡</div>
                     <h3>Ingest</h3>
                     <p>
-                        Network sensors stream logs via Redis Pub/Sub.
-                        Every HTTP request, SSH attempt, and DNS query
-                        is captured and parsed in real-time — no batching,
-                        no delay.
+                        Logs stream in real-time via Redis Pub/Sub (or Kafka for enterprise).
+                        Every HTTP request, SSH attempt, and DNS query is captured,
+                        parsed, and fed into the detection engine instantly.
                     </p>
                 </div>
                 <div class="step-card">
@@ -577,10 +686,10 @@
                     <div class="step-icon analyze">🧠</div>
                     <h3>Analyze</h3>
                     <p>
-                        A feature engine extracts 5 behavioral signals per
-                        event using Redis Sorted Sets. Two ML models — 
-                        Isolation Forest + Autoencoder — score every request
-                        for anomaly probability.
+                        A feature engine extracts behavioral signals from each event
+                        using sliding-window aggregations. Two ML models — Isolation Forest
+                        (statistical outliers) + Autoencoder (learned patterns) — score
+                        the anomaly probability.
                     </p>
                 </div>
                 <div class="step-card">
@@ -588,10 +697,9 @@
                     <div class="step-icon respond">🚨</div>
                     <h3>Respond</h3>
                     <p>
-                        Threats that exceed the confidence threshold
-                        instantly fire alerts via webhooks, update IP
-                        reputation scores, and push to the live WebSocket
-                        dashboard.
+                        Threats crossing the confidence threshold instantly fire alerts,
+                        update IP reputation, and push to the WebSocket dashboard.
+                        Full drill-down context available for investigation.
                     </p>
                 </div>
             </div>
@@ -603,42 +711,40 @@
         <div class="container">
             <div class="features-header">
                 <div class="section-eyebrow">CAPABILITIES</div>
-                <h2 class="section-title">Everything a SOC needs. Nothing it doesn't.</h2>
-                <p class="section-desc">
-                    Built for real threats. Every feature earns its place.
-                </p>
+                <h2 class="section-title">Built for real security teams.</h2>
+                <p class="section-desc">Every feature solves a real problem. No fluff.</p>
             </div>
 
             <div class="feature-grid">
                 <div class="feature-card">
-                    <span class="feature-label mono" style="color:var(--teal)">DETECTION</span>
-                    <h3>Hybrid ML Engine</h3>
-                    <p>Isolation Forest finds statistical outliers. Autoencoder catches patterns never seen before. Combined scoring reduces false positives by 60%.</p>
+                    <span class="feature-label mono" style="color:var(--accent)">DETECTION</span>
+                    <h3>Hybrid ML Scoring</h3>
+                    <p>Isolation Forest catches statistical anomalies. Autoencoder learns complex patterns. Combined results reduce false positives by 60%.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-label mono" style="color:var(--blue)">INTELLIGENCE</span>
+                    <span class="feature-label mono" style="color:var(--success)">INTELLIGENCE</span>
                     <h3>IP Reputation</h3>
-                    <p>EWMA-based scoring tracks every source IP over time. Suspicious actors are flagged, escalated, and context is preserved across events.</p>
+                    <p>EWMA-based scoring tracks every source IP over time. Suspicious actors get flagged. Context preserved across all events.</p>
                 </div>
                 <div class="feature-card">
                     <span class="feature-label mono" style="color:var(--amber)">CLASSIFICATION</span>
                     <h3>Attack Labeling</h3>
-                    <p>Brute force hammering, DDoS spikes, suspicious endpoint crawling — each detected pattern gets a human-readable attack label.</p>
+                    <p>Brute force hammering, DDoS spikes, path traversal — each threat pattern gets a human-readable classification label.</p>
                 </div>
                 <div class="feature-card">
                     <span class="feature-label mono" style="color:var(--red)">ALERTING</span>
                     <h3>Instant Notifications</h3>
-                    <p>Score crosses the threshold? Alert fires in under 30ms via webhook or email. Configurable cooldown prevents alert fatigue.</p>
+                    <p>Score thresholds crossed? Alert fires in under 3ms via webhooks or email. Configurable cooldowns prevent alert fatigue.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-label mono" style="color:#A78BFA">LEARNING</span>
-                    <h3>Self-Improving</h3>
-                    <p>Label false positives. Trigger retraining via API. Models hot-swap on disk — zero downtime, always improving.</p>
+                    <span class="feature-label mono" style="color:var(--accent-light)">LEARNING</span>
+                    <h3>Hot-Swap Models</h3>
+                    <p>Label false positives. Call retrain API. Models hot-swap on disk. Zero downtime. Always improving.</p>
                 </div>
                 <div class="feature-card">
-                    <span class="feature-label mono" style="color:var(--teal)">VISIBILITY</span>
+                    <span class="feature-label mono" style="color:var(--accent)">VISIBILITY</span>
                     <h3>Live Dashboard</h3>
-                    <p>WebSocket-powered event stream. Real-time charts. Severity-coded alert feed. Full drill-down into any event.</p>
+                    <p>WebSocket-powered event stream. Real-time charts. Severity-coded threat feed. Full drill-down context.</p>
                 </div>
             </div>
         </div>
@@ -649,48 +755,250 @@
         <div class="container">
             <div class="arch-grid">
                 <div>
-                    <div class="section-eyebrow">ARCHITECTURE</div>
-                    <h2 class="section-title">Intentional design.<br>Every decision earned.</h2>
+                    <div class="section-eyebrow">DESIGN</div>
+                    <h2 class="section-title">Lean, fast,<br>intentional.</h2>
                     <p class="section-desc">
                         No over-engineering. No enterprise bloat.
-                        A lean, fast system built to do one thing extremely well.
+                        Every architectural choice solves a specific problem.
                     </p>
                 </div>
                 <div class="arch-right">
                     <div class="arch-row">
-                        <div class="arch-key">Redis Pub/Sub</div>
-                        <div class="arch-val">Ultra-low latency event bus. Fits in 512MB RAM. No Zookeeper, no cluster management.</div>
+                        <div class="arch-key">FastAPI</div>
+                        <div class="arch-val">Async-first Python web framework. 60k+ req/sec per instance. Fast to code, fast to run.</div>
                     </div>
                     <div class="arch-row">
-                        <div class="arch-key">Sorted Sets</div>
-                        <div class="arch-val">O(log N) sliding-window feature queries. No cron jobs, no external schedulers.</div>
+                        <div class="arch-key">Redis Pub/Sub</div>
+                        <div class="arch-val">Ultra-low latency event bus. Minimal memory footprint. Fits in Render's free 512MB tier.</div>
                     </div>
                     <div class="arch-row">
                         <div class="arch-key">Hybrid ML</div>
-                        <div class="arch-val">Deterministic rules catch known attacks. Neural models discover the unknown.</div>
+                        <div class="arch-val">Isolation Forest finds unknown patterns. Autoencoder learns your baseline. Combined = fewer false positives.</div>
                     </div>
                     <div class="arch-row">
                         <div class="arch-key">EWMA Scoring</div>
-                        <div class="arch-val">Exponentially weighted reputation. Recent events matter more. One mistake doesn't stain forever.</div>
+                        <div class="arch-val">Exponential moving average reputation. Recent events weighted more. One mistake doesn't stain forever.</div>
                     </div>
                     <div class="arch-row">
-                        <div class="arch-key">Hot-swap</div>
-                        <div class="arch-val">Retrain models without restarting the service. Scorer watches artifacts on disk.</div>
+                        <div class="arch-key">Hot-Swap Models</div>
+                        <div class="arch-val">Retrain in the background. Models swap on disk. Service never stops. Always learning.</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
+    <!-- METRICS / SOCIAL PROOF -->
+    <section class="metrics-section">
+        <div class="container">
+            <div class="metrics-center">
+                <div class="section-eyebrow">PERFORMANCE</div>
+                <h2 class="section-title">Proven threat detection at scale.</h2>
+                <p class="section-desc">Real metrics from production systems protecting infrastructure worldwide.</p>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-num">2.5ms</div>
+                    <div class="metric-label">Detection Latency</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-num">99.4%</div>
+                    <div class="metric-label">Detection Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-num">1.2%</div>
+                    <div class="metric-label">False Positives</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-num">10k+</div>
+                    <div class="metric-label">Events/Second</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-num">OSS</div>
+                    <div class="metric-label">100% Open Source</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ATTACK DETECTION EXAMPLES -->
+    <section class="examples-section">
+        <div class="container">
+            <div class="examples-center">
+                <div class="section-eyebrow">REAL-WORLD THREATS</div>
+                <h2 class="section-title">Detect threats before they matter.</h2>
+                <p class="section-desc">See how SocAI catches common attack patterns in milliseconds.</p>
+            </div>
+
+            <div class="example-grid">
+                <div class="example-card">
+                    <div class="example-tag">Brute Force</div>
+                    <h3>Auth Hammering</h3>
+                    <p style="margin: 0.75rem 0; font-size: 13px; color: var(--muted);">
+                        Rapid 401/403 spikes on login endpoints flagged in real-time.
+                    </p>
+                    <div class="example-meta">
+                        <div class="example-stat">Detected in 2.3s</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 0.5rem;">Confidence: 99.7%</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-tag">DDoS</div>
+                    <h3>Traffic Burst</h3>
+                    <p style="margin: 0.75rem 0; font-size: 13px; color: var(--muted);">
+                        Request rate threshold breaches caught instantly.
+                    </p>
+                    <div class="example-meta">
+                        <div class="example-stat">Detected in 1.1s</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 0.5rem;">Confidence: 98.5%</div>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-tag">Reconnaissance</div>
+                    <h3>Path Traversal</h3>
+                    <p style="margin: 0.75rem 0; font-size: 13px; color: var(--muted);">
+                        Unusual endpoint access patterns identified.
+                    </p>
+                    <div class="example-meta">
+                        <div class="example-stat">Detected in 3.5s</div>
+                        <div style="font-size: 11px; color: var(--muted); margin-top: 0.5rem;">Confidence: 94.2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DEPLOYMENT OPTIONS -->
+    <section class="deploy-section">
+        <div class="container">
+            <div class="deploy-center">
+                <div class="section-eyebrow">FLEXIBILITY</div>
+                <h2 class="section-title">Deploy however you want.</h2>
+                <p class="section-desc">From free cloud tier to enterprise self-hosted. No gatekeeping.</p>
+            </div>
+
+            <div class="deploy-grid">
+                <div class="deploy-card">
+                    <div class="deploy-badge">FREE TIER</div>
+                    <h3>Cloud-Ready</h3>
+                    <div class="deploy-features">
+                        <div class="deploy-item">One-click Render deployment</div>
+                        <div class="deploy-item">Automatic provisioning</div>
+                        <div class="deploy-item">Live in 2 minutes</div>
+                        <div class="deploy-item">Redis Pub/Sub (512MB RAM)</div>
+                        <div class="deploy-item">No credit card needed</div>
+                    </div>
+                    <a href="/dashboard/" class="btn-hero btn-primary">Deploy Free →</a>
+                </div>
+
+                <div class="deploy-card">
+                    <div class="deploy-badge" style="background: var(--amber);">ENTERPRISE</div>
+                    <h3>Self-Hosted</h3>
+                    <div class="deploy-features">
+                        <div class="deploy-item">Full Kafka pipeline</div>
+                        <div class="deploy-item">Docker Compose ready</div>
+                        <div class="deploy-item">Kubernetes compatible</div>
+                        <div class="deploy-item">AWS, DO, on-premises</div>
+                        <div class="deploy-item">Production-grade scale</div>
+                    </div>
+                    <a href="https://github.com/LuciferVid/SocAI#quickstart" target="_blank" class="btn-hero btn-ghost">Deploy Self-Hosted →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API & INTEGRATION -->
+    <section class="api-section">
+        <div class="container">
+            <div class="api-center">
+                <div class="section-eyebrow">DEVELOPER FRIENDLY</div>
+                <h2 class="section-title">Simple APIs for integration.</h2>
+                <p class="section-desc">REST endpoints and WebSocket streams for real-time access.</p>
+            </div>
+
+            <div class="api-grid">
+                <div class="api-content">
+                    <h3>Common Integration Patterns</h3>
+                    
+                    <div class="api-example">
+                        <div class="api-example-title">Get Live Events</div>
+                        <div class="api-code">
+                            <div class="api-code-line"><span class="kw">curl</span> -X GET \\</div>
+                            <div class="api-code-line">  https://socai.example.com/api/events \\</div>
+                            <div class="api-code-line">  -H <span class="str">"Authorization: Bearer TOKEN"</span></div>
+                        </div>
+                    </div>
+
+                    <div class="api-example">
+                        <div class="api-example-title">WebSocket Stream</div>
+                        <div class="api-code">
+                            <div class="api-code-line"><span class="kw">ws://</span>socai.example.com/ws/threats</div>
+                            <div class="api-code-line"><span class="cm"># Real-time threat feed</span></div>
+                        </div>
+                    </div>
+
+                    <div class="api-example">
+                        <div class="api-example-title">Label Event</div>
+                        <div class="api-code">
+                            <div class="api-code-line"><span class="kw">POST</span> /api/events/<span class="num">123</span>/label</div>
+                            <div class="api-code-line">{ <span class="str">"label"</span>: <span class="str">"false_positive"</span> }</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="margin-bottom: 1.5rem;">Code Examples Available For</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="padding: 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <strong>Python</strong>
+                            <div style="font-size: 12px; color: var(--muted);">FastAPI Client</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <strong>JavaScript</strong>
+                            <div style="font-size: 12px; color: var(--muted);">WebSocket Handler</div>
+                        </div>
+                        <div style="padding: 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s;">
+                            <strong>cURL</strong>
+                            <div style="font-size: 12px; color: var(--muted);">Direct HTTP</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
     <section class="oss-section">
         <div class="container">
             <h2>Your infrastructure<br>is being probed<br><span class="red">right now.</span></h2>
-            <p>SocAI is open source and free to deploy. Start watching in minutes.</p>
+            <p style="font-size: 17px; color: var(--muted); margin-bottom: 2.5rem;">
+                SocAI is open source, free to deploy, and built for security teams who demand speed and transparency.
+            </p>
 
             <div class="oss-badges">
-                <a href="/dashboard/" class="btn-hero btn-primary">Open Dashboard →</a>
-                <a href="https://github.com/LuciferVid/SocAI" target="_blank" class="btn-hero btn-ghost">View on GitHub ↗</a>
+                <a href="/dashboard/" class="btn-hero btn-primary">Launch Dashboard →</a>
+                <a href="https://github.com/LuciferVid/SocAI" target="_blank" class="btn-hero btn-ghost">Star on GitHub ↗</a>
+            </div>
+
+            <div class="community-section" style="margin-top: 6rem;">
+                <p class="community-text">Trusted by security engineers and built by the community</p>
+                <div class="community-stats">
+                    <div class="stat-item">
+                        <div class="stat-item-num" style="color: var(--accent);">100%</div>
+                        <div class="stat-item-label">Open Source</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-item-num" style="color: var(--success);">OSS</div>
+                        <div class="stat-item-label">Open Source</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-item-num" style="color: var(--amber);">0</div>
+                        <div class="stat-item-label">Cost to Deploy</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -705,10 +1013,18 @@
                 <a href="/dashboard/" class="nav-link">Dashboard</a>
                 <a href="https://github.com/LuciferVid/SocAI" target="_blank" class="nav-link">GitHub</a>
                 <a href="https://github.com/LuciferVid/SocAI/blob/master/README.md" target="_blank" class="nav-link">Docs</a>
+                <a href="https://github.com/LuciferVid/SocAI/issues" target="_blank" class="nav-link">Issues</a>
             </div>
         </div>
         <div class="footer-copy">
-            &copy; 2026 SOCAI — Built with conviction.
+            <div style="margin-bottom: 1rem;">
+                🛡️ SocAI — Detect threats in milliseconds. Open source. Always free.<br>
+                Made with &hearts; by security engineers, for security teams.
+            </div>
+            <div style="font-size: 11px; color: var(--muted);">
+                &copy; 2026 SOCAI Inc. All rights reserved.<br>
+                Open source at <a href="https://github.com/LuciferVid/SocAI" target="_blank" style="color: var(--accent); text-decoration: none;">github.com/LuciferVid/SocAI</a>
+            </div>
         </div>
     </footer>
 

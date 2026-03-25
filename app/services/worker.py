@@ -8,11 +8,13 @@ import logging
 from datetime import datetime, timezone
 
 from app.models.database import async_session
-from app.models.orm import Event, Alert
+from app.models.orm import Event
 from app.services.log_parser import parse_log
 from app.services.feature_engine import FeatureEngine
 from app.services.scorer import get_scorer
 from app.services.messaging import get_messaging_service
+from app.services.alert_dispatcher import maybe_fire_alert
+from app.services.ip_reputation import update_reputation
 from app.api.routes_dashboard import broadcast_event
 from config.settings import settings
 
@@ -74,20 +76,14 @@ async def process_message(raw_message: str):
             await session.commit()
             await session.refresh(event)
 
-            # 4. Check for alerts
+            # 4. Fire alert via dispatcher (handles cooldowns & deduplication)
             if score >= settings.anomaly_threshold:
-                severity = "critical" if score >= 0.95 else "high" if score >= 0.85 else "medium"
-                alert = Alert(
-                    event_id=event.id,
-                    severity=severity,
-                    alert_type=attack_type or "anomaly",
-                    message=f"[{severity.upper()}] Anomaly detected from {event.source_ip}",
-                )
-                session.add(alert)
-                await session.commit()
-                logger.warning(f"ALERT: {alert.message} | Score: {score:.3f}")
+                await maybe_fire_alert(event, score, attack_type)
 
-        # 5. Broadcast to dashboard
+        # 5. Update IP reputation (tracks EWMA score per IP)
+        await update_reputation(parsed["source_ip"], score, attack_type)
+
+        # 6. Broadcast to dashboard
         await broadcast_event({
             "event": {
                 "id": str(event.id),
