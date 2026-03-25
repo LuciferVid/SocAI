@@ -32,7 +32,29 @@ async def lifespan(application: FastAPI):
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
     )
     logger.info("initializing database tables")
-    await init_db()
+    
+    # Retry loop for Render free-tier databases which take time to spin up
+    max_retries = 10
+    for i in range(max_retries):
+        try:
+            await init_db()
+            break
+        except ConnectionRefusedError:
+            if i == max_retries - 1:
+                logger.error("Failed to connect to PostgreSQL after %d retries.", max_retries)
+                raise
+            logger.warning("Database connection refused, retrying in 5 seconds... (%d/%d)", i + 1, max_retries)
+            await asyncio.sleep(5)
+        except Exception as e:
+            # Catching generic exceptions just in case asyncpg wraps the ConnectionRefusedError
+            if "Connection refused" in str(e) or "ConnectionRefusedError" in str(e.__class__.__name__):
+                if i == max_retries - 1:
+                    logger.error("Failed to connect to PostgreSQL after %d retries.", max_retries)
+                    raise
+                logger.warning("Database connection refused, retrying in 5 seconds... (%d/%d)", i + 1, max_retries)
+                await asyncio.sleep(5)
+            else:
+                raise
 
     logger.info("connecting to redis at %s", settings.redis_url)
     redis_pool = aioredis.from_url(
