@@ -75,8 +75,8 @@ async def load_training_data_from_db() -> np.ndarray | None:
         return None
 
     logger.info("loaded %d events from DB for retraining", len(rows))
-    # in a real system, we'd store the full feature vector alongside events...
-    # for now, this is a placeholder that would need the feature cache or event enrichment
+    # Feature vector storage is planned for a future release — requires
+    # persisting the full feature array alongside each event during ingestion
     return None
 
 

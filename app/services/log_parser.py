@@ -38,7 +38,7 @@ def parse_log(raw: dict | str) -> Optional[dict]:
         except json.JSONDecodeError:
             return _parse_text(raw)
 
-    # structured JSON from our fake generator or real API gateways
+    # structured JSON from the sensor agent or real API gateways
     if isinstance(raw, dict):
         return _normalize_dict(raw)
 

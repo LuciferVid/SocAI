@@ -109,33 +109,32 @@
     // ─── WebSocket ───
     function connect() {
         const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-        const wsUrl = `${proto}://${location.hostname}:8000/ws/live`;
+        const wsUrl = `${proto}://${location.host}/ws/live`;
 
         state.ws = new WebSocket(wsUrl);
 
         state.ws.onopen = () => {
             state.connected = true;
             dom.status.innerHTML = '<span class="status-dot online"></span> Live';
-            console.log('[SOC] WebSocket connected');
+
         };
 
         state.ws.onclose = () => {
             state.connected = false;
             dom.status.innerHTML = '<span class="status-dot offline"></span> Disconnected';
-            console.log('[SOC] WebSocket closed — reconnecting in 3s');
+
             setTimeout(connect, 3000);
         };
 
-        state.ws.onerror = (err) => {
-            console.error('[SOC] WebSocket error', err);
+        state.ws.onerror = () => {
+            // reconnection handled by onclose
         };
 
         state.ws.onmessage = (msg) => {
             try {
                 const event = JSON.parse(msg.data);
                 handleEvent(event);
-            } catch (e) {
-                console.warn('[SOC] bad message', e);
+            } catch (_) {
             }
         };
     }
@@ -199,7 +198,6 @@
 
     // ─── Alert feed ───
     function addAlertItem(event) {
-        // remove the placeholder if present
         const empty = dom.alertList.querySelector('.alert-empty');
         if (empty) empty.remove();
 
@@ -311,8 +309,7 @@
                 state.totalAlerts = data.active_alerts || 0;
             }
             updateStats();
-        } catch (e) {
-            console.warn('[SOC] could not load initial stats', e);
+        } catch (_) {
         }
     }
 

@@ -71,7 +71,7 @@ async def catch_all(request: Request, path: str):
     await produce(settings.ingestion_topic, event)
     logger.info("Captured %s %s from %s", method, full_path, source_ip)
 
-    # Return a fake generic response to keep scanners probing
+    # Return a standardized generic response to keep scanners probing
     return Response(
         content='<html><body><p>Access OK</p></body></html>' if status_code == 200 else '<html><body><h1>Not Found</h1></body></html>',
         status_code=status_code,

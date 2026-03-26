@@ -1,5 +1,5 @@
 """
-Fake log generator that produces realistic mixed log events.
+Synthetic log generator that produces realistic mixed log events.
 Simulates HTTP access logs, SSH auth, and API gateway traffic.
 Embeds attack patterns at a configurable rate (~5%) so the ML
 model has something to detect out of the box.
@@ -146,7 +146,7 @@ async def run_generator(
     total_events: int | None = None,
 ):
     """
-    Main entry: produces fake logs to the Kafka raw topic.
+    Main entry: produces synthetic logs to the ingestion topic via Redis.
     - events_per_second: baseline throughput
     - total_events: if set, stop after N events; otherwise run forever
     """

@@ -66,7 +66,7 @@ async def lifespan(application: FastAPI):
     from app.services.worker import run_worker_task
     application.state.worker_task = run_worker_task()
 
-    # Start dummy threat traffic generator (for demo/hosting)
+    # Start synthetic traffic generator (simulates network sensor input)
     from generator.sensor_agent import run_generator
     application.state.generator_task = asyncio.create_task(run_generator())
 

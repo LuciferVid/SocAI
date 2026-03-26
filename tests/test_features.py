@@ -10,7 +10,7 @@ from app.services.feature_engine import FeatureEngine, FEATURE_NAMES
 
 @pytest.fixture
 def mock_redis(monkeypatch):
-    """Use a fakeredis-like dict-based mock for testing without a real Redis."""
+    """Use a mock-redis dict-based implementation for testing without a live Redis instance."""
     import asyncio
 
     class MockRedis:

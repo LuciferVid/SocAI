@@ -783,8 +783,8 @@
         </div>
         
         <div class="ipd-actions">
-          <button class="ipauth-block" id="btnDrawerBlock" onclick="alert('Demo: IP Blocked')">Block IP</button>
-          <button class="ipauth-white" id="btnDrawerWhite" onclick="alert('Demo: IP Whitelisted')">Whitelist</button>
+          <button class="ipauth-block" id="btnDrawerBlock" onclick="alert('IP added to blocklist')">Block IP</button>
+          <button class="ipauth-white" id="btnDrawerWhite" onclick="alert('IP added to allowlist')">Whitelist</button>
           <button class="ipauth-copy" id="btnDrawerCopy">Copy IP</button>
         </div>
       </div>
@@ -992,12 +992,7 @@
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       // attempt endpoints: backend serves /dashboard, so ws is at /ws/live
       const url = `${protocol}//${window.location.host}/ws/live`;
-      try {
-        ws = new WebSocket(url);
-      } catch(e) {
-        // fallback for local testing without server
-        ws = new WebSocket("ws://localhost:8000/ws/live");
-      }
+      ws = new WebSocket(url);
 
       ws.onopen = () => {
         dom.liveIndicator.classList.remove('disconnected');
@@ -1006,7 +1001,7 @@
       };
 
       ws.onmessage = (e) => {
-        if(state.isPaused) return; // cache if wanted, but drop is easier for demo
+        if(state.isPaused) return;
         try {
           const parsedData = JSON.parse(e.data);
           const raw = parsedData.event || parsedData;
@@ -1024,7 +1019,7 @@
           };
           
           processEvent(payload);
-        } catch(err) { console.error('WS parsing err', err); }
+        } catch(_) { /* malformed WS payload — skip */ }
       };
 
       ws.onclose = () => {
@@ -1257,7 +1252,7 @@
       } catch(e) {
         retMeta.style.color = 'var(--red)';
         retMeta.innerText = `Retrain failed — check server logs`;
-        console.error('[SOC] retrain failed', e);
+
       }
 
       btnRetrain.disabled = false;

@@ -85,7 +85,7 @@ python -m generator.sensor_agent
 
 ### 5. Access Dashboard
 
-Navigate to **[http://localhost:8000](http://localhost:8000)** to see the SOCAI platform and live dashboard.
+Navigate to **[https://soc-api-v0ks.onrender.com](https://soc-api-v0ks.onrender.com)** for the live production instance, or `http://localhost:8000` during local development.
 
 
 ---
