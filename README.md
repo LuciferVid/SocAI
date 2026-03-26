@@ -87,63 +87,6 @@ python -m generator.sensor_agent
 
 Navigate to **[http://localhost:8000](http://localhost:8000)** to see the SOCAI platform and live dashboard.
 
----
 
-## Learning Path: How to Build This as a 2nd Year Student
-
-This project synthesizes concepts from multiple CS domains. Here's a realistic learning journey:
-
-### Core Prerequisites (learned in 1st-2nd year)
-
-- **Python fundamentals** - OOP, decorators, async/await
-- **SQL basics** - Schema design, queries, relationships
-- **Web frameworks** - FastAPI, HTTP, REST APIs
-- **Data structures** - Arrays, hash maps (for O(log N) understanding)
-
-### Key Concepts Learned While Building
-
-1. **Redis Data Structures**
-   - Start: "What's a cache?" → Memcached or Redis
-   - Depth: Sorted sets (ZADD, ZRANGEBYSCORE) for sliding windows
-   - Reference: Redis official docs, 2-3 hours practice
-
-2. **Async I/O with Python**
-   - Why: Database connections block → use asyncio
-   - Practice: Async FastAPI endpoints, SQLAlchemy + asyncpg
-   - Time investment: ~1 week of practical coding
-
-3. **ML Anomaly Detection**
-   - Start: "What's outlier detection?" → scikit-learn tutorial
-   - Isolation Forest: Read paper, use sklearn implementation (no training needed)
-   - Autoencoder: PyTorch basics, reconstruction error concept
-   - Time: 2-3 weeks to understand + implement
-
-4. **Real-Time Streaming**
-   - Problem: How to process 100 events/sec?
-   - Solution: Background worker task (FastAPI lifespan context)
-   - Don't need Kafka for prototypes — Redis Pub/Sub is simpler
-
-5. **DevOps Essentials**
-   - Docker basics (containers, compose)
-   - Environment variables, secrets management
-   - Deployment to free tier (Render, Railway)
-
-### Why This is Realistic for a 2nd Year Student
-
-- **Not starting from zero** - DS/DSA/Web courses provide foundation
-- **Incremental complexity** - Start with a simple API, add features
-- **Open-source leverage** - FastAPI, scikit-learn, PyTorch do the heavy lifting
-- **Learning by building** - Each feature teaches something new
-- **Months, not days** - This is a semester/summer project
-
-### Resources Used
-
-- FastAPI docs
-- Redis docs (sorted sets guide)
-- scikit-learn Isolation Forest
-- PyTorch tutorials
-- Stackoverflow + ChatGPT for debugging
-
----
 
 **© 2026 SOCAI Inc. Proprietary and Confidential.**
