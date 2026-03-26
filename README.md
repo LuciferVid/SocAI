@@ -88,5 +88,10 @@ python -m generator.sensor_agent
 Navigate to **[http://localhost:8000](http://localhost:8000)** to see the SOCAI platform and live dashboard.
 
 
+---
 
-**© 2026 SOCAI Inc. Proprietary and Confidential.**
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**© 2026 SOCAI — Open Source Threat Intelligence**
