@@ -29,7 +29,7 @@ class IsolationForestModel:
             n_estimators=n_estimators,
             contamination=contamination,
             random_state=42,
-            n_jobs=-1,
+            n_jobs=1,
         )
         self._fitted = False
 
@@ -72,5 +72,6 @@ class IsolationForestModel:
             logger.warning("model file not found at %s — starting unfitted", path)
             return
         self.model = joblib.load(path)
+        self.model.set_params(n_jobs=1)
         self._fitted = True
         logger.info("model loaded from %s", path)

@@ -11,6 +11,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+torch.set_num_threads(1)
+
 logger = logging.getLogger("soc.ml.autoencoder")
 
 
