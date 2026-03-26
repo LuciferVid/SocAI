@@ -580,7 +580,7 @@
                     <span class="dot-r"></span>
                     <span class="dot-y"></span>
                     <span class="dot-g"></span>
-                    <div class="mockup-url mono">socai.example.com/dashboard</div>
+                    <div class="mockup-url mono">soc-api-v0ks.onrender.com/dashboard/</div>
                 </div>
                 <div class="mockup-body">
                     <div class="mock-live mono">
@@ -924,27 +924,26 @@
                     <h3>Common Integration Patterns</h3>
                     
                     <div class="api-example">
-                        <div class="api-example-title">Get Live Events</div>
+                        <div class="api-example-title">Get IP Reputation</div>
                         <div class="api-code">
-                            <div class="api-code-line"><span class="kw">curl</span> -X GET \\</div>
-                            <div class="api-code-line">  https://socai.example.com/api/events \\</div>
-                            <div class="api-code-line">  -H <span class="str">"Authorization: Bearer TOKEN"</span></div>
+                            <div class="api-code-line"><span class="kw">curl</span> -X GET \</div>
+                            <div class="api-code-line">  https://soc-api-v0ks.onrender.com/api/reputation/</div>
                         </div>
                     </div>
 
                     <div class="api-example">
                         <div class="api-example-title">WebSocket Stream</div>
                         <div class="api-code">
-                            <div class="api-code-line"><span class="kw">ws://</span>socai.example.com/ws/threats</div>
+                            <div class="api-code-line"><span class="kw">wss://</span>soc-api-v0ks.onrender.com/ws/live</div>
                             <div class="api-code-line"><span class="cm"># Real-time threat feed</span></div>
                         </div>
                     </div>
 
                     <div class="api-example">
-                        <div class="api-example-title">Label Event</div>
+                        <div class="api-example-title">Retrain Models</div>
                         <div class="api-code">
-                            <div class="api-code-line"><span class="kw">POST</span> /api/events/<span class="num">123</span>/label</div>
-                            <div class="api-code-line">{ <span class="str">"label"</span>: <span class="str">"false_positive"</span> }</div>
+                            <div class="api-code-line"><span class="kw">POST</span> /api/retrain/</div>
+                            <div class="api-code-line">{ <span class="str">"threshold"</span>: <span class="num">0.8</span> }</div>
                         </div>
                     </div>
                 </div>
